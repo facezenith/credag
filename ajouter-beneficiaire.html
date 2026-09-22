@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ajouter un Bénéficiaire</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand: #ff6600;
+            --secondary: #003366;
+            --secondary-dark: #002244;
+            --text-dark: #1f2933;
+            --bg-light: #f5f7fb;
+            --border-color: #e0e4f0;
+            --text-muted: #6c757d;
+            --sidebar-width: 250px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- LAYOUT GLOBAL --- */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* --- MENU SLIDE / SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--secondary);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .logo-section {
+            padding: 20px 15px;
+            text-align: center;
+            background: var(--secondary-dark);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .logo-section img {
+            height: 35px;
+            background: #fff;
+            padding: 4px;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        .logo-section p {
+            font-size: 11px;
+            color: #ccc;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        .close-sidebar-btn {
+            display: none;
+            position: absolute;
+            top: 15px; right: 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 15px 0;
+            overflow-y: auto;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #d1dce5;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+        .nav-link.active {
+            background: rgba(255, 102, 0, 0.15);
+            color: #fff;
+            border-left-color: var(--brand);
+        }
+
+        /* Overlay sombre Android */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- MAIN CONTENT WRAPPER --- */
+        .main-wrapper {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* --- HEADER TOP --- */
+        .header {
+            background: #fff;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+
+        .menu-toggle-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .search input {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 250px;
+            font-size: 13px;
+            outline: none;
+            background: var(--bg-light);
+        }
+
+        .icons { font-size: 18px; display: flex; gap: 12px; cursor: pointer; }
+
+        /* --- CONTENU DE LA PAGE --- */
+        .content-container {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+            padding: 25px;
+            flex: 1;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            max-width: 650px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--secondary);
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fafafa;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--brand);
+            background: #fff;
+        }
+
+        .form-actions { margin-top: 20px; }
+
+        .btn {
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .right-sidebar { display: flex; flex-direction: column; gap: 15px; }
+
+        .widget {
+            background: #fff;
+            padding: 18px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .widget h4 { color: var(--secondary); margin-bottom: 8px; }
+        .widget img { max-width: 100%; height: auto; border-radius: 6px; margin-top: 10px; }
+
+        /* --- BARRE DE NAVIGATION ANDROID (BAS DE PAGE) --- */
+        .mobile-footer-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+            padding: 8px 0;
+            z-index: 900;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .mobile-footer-tabs { display: flex; justify-content: space-around; align-items: center; }
+
+        .mobile-tab {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .mobile-tab.active { color: var(--brand); }
+
+        /* --- RESPONSIVE / ADAPTATION MOBILE --- */
+        @media (max-width: 900px) {
+            .content-container { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 270px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; opacity: 1; }
+            .close-sidebar-btn { display: block; }
+            
+            .main-wrapper { margin-left: 0; padding-bottom: 60px; }
+            .menu-toggle-btn { display: block; }
+            
+            .header { padding: 0 15px; }
+            .search input { width: 140px; }
+            .content-container { padding: 15px; }
+            .mobile-footer-nav { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- Overlay sombre tactile Android -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MENU SLIDE COULISSANT -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-section">
+            <button class="close-sidebar-btn" id="closeSidebarBtn">✕</button>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM7lGTyAI0yZzf5VJ51yertxgJvZH7m7XmQ&s" alt="Logo">
+            <p>Espace client</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link"><span>📊</span> &nbsp; Comptes & Cartes</a>
+            <a href="credits.html" class="nav-link"><span>🏦</span> &nbsp; Crédits</a>
+            <a href="cartes.html" class="nav-link"><span>💳</span> &nbsp; Cartes</a>
+            <a href="profil.html" class="nav-link"><span>👤</span> &nbsp; Profil</a>
+            <a href="virement.html" class="nav-link"><span>💸</span> &nbsp; Virement</a>
+            <a href="ajouter-beneficiaire.html" class="nav-link active"><span>➕</span> &nbsp; Ajouter Bénéficiaire</a>
+            <a href="historique.html" class="nav-link"><span>📜</span> &nbsp; Historique</a>
+            <a href="en-ligne.html" class="nav-link"><span>💬</span> &nbsp; Contacter en ligne</a>
+            <a href="#" class="nav-link" id="logoutLink" style="color: #ff8888; margin-top: 15px;"><span>🚪</span> &nbsp; Déconnexion</a>
+        </nav>
+    </aside>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <div class="main-wrapper">
+
+        <!-- HEADER TOP -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle-btn" id="menuToggleBtn">☰</button>
+                <div class="search"><input placeholder="Rechercher..." /></div>
+            </div>
+            <div class="icons">
+                <span>📞</span>
+                <span>✉️</span>
+                <span>🔒</span>
+            </div>
+        </header>
+
+        <!-- ZONE DE CONTENU -->
+        <div class="content-container">
+            <main class="main-content">
+                <div class="section">
+                    <h2 style="color: var(--secondary); margin-bottom: 8px;">Ajouter un Nouveau Bénéficiaire</h2>
+                    <p style="font-size:13px; color: var(--text-muted); margin-bottom: 20px;">Saisissez les coordonnées bancaires du destinataire.</p>
+                    
+                    <div id="form-message" style="margin-bottom: 15px; padding: 10px; border-radius: 4px; font-weight: 600;" hidden></div>
+
+                    <form id="add-beneficiary-form">
+                        <div class="form-group">
+                            <label for="beneficiary-name">Nom / Alias du Bénéficiaire :</label>
+                            <input type="text" id="beneficiary-name" required placeholder="Ex: Mon Loyer, Entreprise X">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="beneficiary-iban">IBAN :</label>
+                            <input type="text" id="beneficiary-iban" required placeholder="FR76XXXXXXXXXXXXXXXXXXXXX" pattern="[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}" title="Veuillez saisir un IBAN valide.">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="beneficiary-bic">BIC / SWIFT :</label>
+                            <input type="text" id="beneficiary-bic" required placeholder="EX: CRLYFR21XXX" pattern="[A-Z0-9]{8}([A-Z0-9]{3})?" title="Veuillez saisir un BIC valide.">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="beneficiary-email">Adresse E-mail :</label>
+                            <input type="email" id="beneficiary-email" required placeholder="Ex: destinataire@mail.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="beneficiary-bank">Nom de la Banque (Optionnel) :</label>
+                            <input type="text" id="beneficiary-bank" placeholder="Ex: Crédit Agricole, BNP Paribas">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn" id="add-benef-submit-btn">Enregistrer le Bénéficiaire</button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+            
+            <aside class="right-sidebar">
+                <div class="widget">
+                    <h4>Validation Securisée</h4>
+                    <p style="font-size:13px; color:#666;">L'ajout d'un bénéficiaire peut nécessiter une vérification supplémentaire.</p>
+                </div>
+                <img src="https://i.ytimg.com/vi/7QGFDP2iBIc/maxresdefault.jpg" alt="Info" style="width: 100%; border-radius: 8px;">
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!-- BARRE ANDROID BAS DE PAGE -->
+<footer class="mobile-footer-nav">
+    <div class="mobile-footer-tabs">
+        <a href="dashboard.html" class="mobile-tab">
+            <span>📊</span> COMPTES
+        </a>
+        <a href="cartes.html" class="mobile-tab">
+            <span>💳</span> CARTES
+        </a>
+        <a href="virement.html" class="mobile-tab">
+            <span>💸</span> VIREMENT
+        </a>
+        <a href="ajouter-beneficiaire.html" class="mobile-tab active">
+            <span>➕</span> AJOUTER
+        </a>
+    </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="data.js"></script>
+<script src="shared.js"></script>
+
+<script>
+    // GESTION DU MENU SLIDE (TACTILE ANDROID)
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    if (menuToggleBtn) menuToggleBtn.addEventListener('click', openSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+    // GESTION FORMULAIRE
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof checkAuth === 'function' && !checkAuth()) return; 
+
+        const form = document.getElementById('add-beneficiary-form');
+        const formMessage = document.getElementById('form-message');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newBeneficiary = {
+                name: document.getElementById('beneficiary-name').value.trim(),
+                iban: document.getElementById('beneficiary-iban').value.trim().toUpperCase(),
+                bic: document.getElementById('beneficiary-bic').value.trim().toUpperCase(),
+                email: document.getElementById('beneficiary-email').value.trim(), 
+                bank: document.getElementById('beneficiary-bank').value.trim() || 'Banque non spécifiée',
+                motif: 'Virement régulier' 
+            };
+            
+            const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : {};
+
+            const isDuplicate = (currentUser.beneficiaries || []).some(b => b.iban === newBeneficiary.iban);
+            
+            if (isDuplicate) {
+                formMessage.hidden = false;
+                formMessage.style.background = '#fff3cd';
+                formMessage.style.color = '#856404';
+                formMessage.textContent = "Ce bénéficiaire existe déjà (IBAN dupliqué).";
+                return;
+            }
+
+            currentUser.beneficiaries = currentUser.beneficiaries || [];
+            currentUser.beneficiaries.push(newBeneficiary);
+            
+            if (typeof saveCurrentUser === 'function') {
+                saveCurrentUser(currentUser);
+            }
+
+            formMessage.hidden = false;
+            formMessage.style.background = '#d4edda';
+            formMessage.style.color = '#155724';
+            formMessage.textContent = "Bénéficiaire ajouté avec succès ! Redirection...";
+            
+            setTimeout(() => {
+                window.location.href = 'virement.html';
+            }, 1500); 
+        });
+    });
+</script>
+</body>
+</html>

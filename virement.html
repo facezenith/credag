@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Espace client - Effectuer un Virement</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand: #ff6600; 
+            --brand-dark: #e05c00;
+            --secondary: #003366; 
+            --text-dark: #212121;
+            --text-muted: #666666;
+            --bg-light: #f4f6f9;
+            --surface: #ffffff;
+            --border-color: #e0e0e0;
+            --radius: 12px;
+            --shadow-1: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-2: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', system-ui, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- TOOLBAR / APP BAR ANDROID --- */
+        .app-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--secondary);
+            color: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: var(--shadow-1);
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .menu-btn:active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .app-bar-title {
+            font-size: 18px;
+            font-weight: 500;
+            flex-grow: 1;
+        }
+
+        /* --- MENU COULISSANT (DRAWER) --- */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%;
+            background: var(--surface);
+            z-index: 201;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-2);
+        }
+
+        .drawer.active {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            background: var(--secondary);
+            color: white;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .drawer-header img {
+            height: 40px;
+            width: auto;
+            background: #fff;
+            padding: 4px;
+            border-radius: 6px;
+            align-self: flex-start;
+        }
+
+        .drawer-header .title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .drawer-nav {
+            padding: 8px 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .drawer-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 0 24px 24px 0;
+            margin-right: 8px;
+            transition: background 0.2s;
+        }
+
+        .drawer-nav a.active {
+            background: rgba(255, 102, 0, 0.15);
+            color: var(--brand);
+        }
+
+        .drawer-nav a:active {
+            background: #eee;
+        }
+
+        .drawer-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 8px 0;
+        }
+
+        /* --- CONTENU PRINCIPAL --- */
+        .main-container {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 16px;
+            flex-grow: 1;
+        }
+
+        /* CARTES MATERIAL DESIGN */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-1);
+        }
+
+        /* Solde Info */
+        .balance-card {
+            background: linear-gradient(135deg, var(--secondary), #002244);
+            color: white;
+            text-align: center;
+        }
+
+        .balance-card h4 {
+            margin: 0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .balance-card p {
+            margin: 8px 0 0 0;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--brand);
+        }
+
+        /* Style Formulaire Android */
+        h2 {
+            margin: 0 0 8px 0;
+            font-size: 20px;
+            color: var(--secondary);
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            background: #fafafa;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--brand);
+            background: #fff;
+        }
+
+        /* Boutons Android */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: var(--shadow-1);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--brand);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--brand-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Messages */
+        .message-loading {
+            color: var(--secondary);
+            text-align: center;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .message-error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        /* Quick Actions Section */
+        .quick-actions-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin: 24px 0 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- APP BAR STYLE ANDROID -->
+    <header class="app-bar">
+        <button class="menu-btn" id="openDrawer" aria-label="Ouvrir le menu">☰</button>
+        <div class="app-bar-title">Espace Client</div>
+    </header>
+
+    <!-- OVERLAY ET MENU COULISSANT (DRAWER) -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    
+    <aside class="drawer" id="drawer">
+        <div class="drawer-header">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM7lGTyAI0yZzf5VJ51yertxgJvZH7m7XmQ&s" alt="GTCO Logo">
+            <div class="title">CREDIT AGRICOLE</div>
+        </div>
+        <nav class="drawer-nav">
+            <a href="dashboard.html">Comptes & Cartes</a>
+            <a href="cartes.html">Mes Cartes</a>
+            <a href="profil.html">Profil</a>
+            <a href="rib.html">Mon RIB</a>
+            
+            <div class="drawer-divider"></div>
+            
+            <a href="virement.html" class="active">Effectuer un Virement</a>
+            <a href="ajouter-beneficiaire.html">Ajouter Bénéficiaire</a>
+            <a href="historique.html">Historique</a>
+            <a href="en-ligne.html">Contacter en ligne</a>
+            
+            <div class="drawer-divider"></div>
+            
+            <a href="#" id="logoutLink" style="color: #d32f2f;">Déconnexion</a>
+        </nav>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="main-container">
+
+        <!-- CARTE DE SOLDE -->
+        <div class="card balance-card">
+            <h4>Solde disponible</h4>
+            <p id="currentBalance">Chargement...</p>
+        </div>
+
+        <!-- FORMULAIRE DE VIREMENT -->
+        <div class="card">
+            <h2>Effectuer un Virement 💸</h2>
+            <div class="subtitle">Saisissez les détails du destinataire pour valider le virement.</div>
+
+            <form id="transferForm">
+                <input type="hidden" name="client_name" id="user_name_hidden">
+                <input type="hidden" name="client_email" id="user_email_hidden">
+
+                <div class="input-group">
+                    <label for="montant">Montant (€)</label>
+                    <input type="number" step="0.01" min="1" id="montant" name="montant" required placeholder="0.00" />
+                </div>
+
+                <div class="input-group">
+                    <label for="iban">IBAN Bénéficiaire</label>
+                    <input type="text" id="iban" name="iban" placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="bic">BIC Bénéficiaire</label>
+                    <input type="text" id="bic" name="bic" placeholder="BNPAFRPPXXX" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="domiciliation">Nom / Domiciliation du Bénéficiaire</label>
+                    <input type="text" id="domiciliation" name="domiciliation" placeholder="Ex: Jean Dupont / BNP Paribas" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="user_name">Nom et Prénom de l'expéditeur</label>
+                    <input type="text" id="user_name" name="user_name" placeholder="Nom complet" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="user_email">Email de l'expéditeur</label>
+                    <input type="email" id="user_email" name="user_email" placeholder="exemple@mail.com" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="date">Date d'exécution</label>
+                    <input type="date" id="date" name="date" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="motif">Motif / Référence</label>
+                    <input type="text" id="motif" name="motif" placeholder="Raison du virement" required />
+                </div>
+
+                <p id="transferLoading" class="message-loading" hidden>Traitement du virement en cours...</p>
+                <div id="transferError" class="message-error" hidden>Une erreur est survenue. Veuillez vérifier les informations.</div>
+
+                <button type="submit" class="btn btn-primary" id="transferButton" disabled>Valider le Virement</button>
+            </form>
+        </div>
+
+        <!-- RACCOURCIS / SERVICES -->
+        <div class="quick-actions-title">Services rapides</div>
+        <div class="card" style="padding: 16px;">
+            <div style="margin-bottom: 12px;">
+                <strong>Virement Instantané</strong>
+                <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0;">Plafond de 1000€ max.</p>
+            </div>
+            <button class="btn btn-secondary">Effectuer un Virement Instantané</button>
+        </div>
+
+    </main>
+
+    <!-- SCRIPTS DES SERVICES -->
+    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="data.js"></script>
+    <script src="shared.js"></script>
+
+    <script>
+    // -----------------------------------------------
+    // GESTION DU MENU COULISSANT (DRAWER)
+    // -----------------------------------------------
+    const drawer = document.getElementById('drawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const openDrawerBtn = document.getElementById('openDrawer');
+
+    function toggleDrawer(open) {
+        if (open) {
+            drawer.classList.add('active');
+            drawerOverlay.classList.add('active');
+        } else {
+            drawer.classList.remove('active');
+            drawerOverlay.classList.remove('active');
+        }
+    }
+
+    openDrawerBtn.addEventListener('click', () => toggleDrawer(true));
+    drawerOverlay.addEventListener('click', () => toggleDrawer(false));
+
+    // -----------------------------------------------
+    // INIT EmailJS
+    // -----------------------------------------------
+    emailjs.init("Mw2rvwAZxMJ2RHQ8n");
+    const SERVICE_ID = "service_mnehge8";
+    const TEMPLATE_ID = "template_y5wqgt8";
+
+    // -----------------------------------------------
+    // INIT Firebase
+    // -----------------------------------------------
+    var firebaseConfig = {
+        apiKey: "AIzaSyBXQnoenWmWvYgoKT2qWQfk5j4cVLWZr4Y",
+        authDomain: "acs-v-e6ef3.firebaseapp.com",
+        projectId: "acs-v-e6ef3",
+        storageBucket: "acs-v-e6ef3.firebasestorage.app",
+        messagingSenderId: "849135031406",
+        appId: "1:849135031406:web:88f7deadc5569357d4027f"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    let db = firebase.firestore();
+
+    // -----------------------------------------------
+    // CONSTANTES ET DOM
+    // -----------------------------------------------
+    const USERS_COLLECTION = "profiles";
+
+    const transferForm = document.getElementById('transferForm');
+    const transferButton = document.getElementById('transferButton');
+    const transferLoading = document.getElementById('transferLoading');
+    const transferError = document.getElementById('transferError');
+    const currentBalanceDisplay = document.getElementById('currentBalance');
+
+    let currentUserData = null;
+    let userDocId = null;
+
+    // -----------------------------------------------
+    // INIT + Session
+    // -----------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+        currentUserData = checkAuth(); // via shared.js
+
+        if (!currentUserData) return;
+
+        userDocId = currentUserData.docId;
+
+        if (!userDocId) {
+            currentBalanceDisplay.textContent = "Erreur : ID utilisateur introuvable.";
+            transferButton.disabled = true;
+            return;
+        }
+
+        // Pré-remplir le formulaire
+        document.getElementById('user_name').value = currentUserData.nom || currentUserData.fullName || "Client GTCO";
+        document.getElementById('user_email').value = currentUserData.email || "contact@gtbank.com";
+
+        fetchCurrentBalance();
+    });
+
+    // -----------------------------------------------
+    // Récupération du solde
+    // -----------------------------------------------
+    function fetchCurrentBalance() {
+        db.collection(USERS_COLLECTION).doc(userDocId).get()
+        .then(doc => {
+            if (!doc.exists) {
+                currentBalanceDisplay.textContent = "Compte introuvable.";
+                transferButton.disabled = true;
+                return;
+            }
+
+            const balance = doc.data().balance || 0;
+            currentUserData.balance = balance;
+
+            currentBalanceDisplay.textContent = formatCurrency(balance);
+            transferButton.disabled = false;
+        })
+        .catch(err => {
+            console.error(err);
+            currentBalanceDisplay.textContent = "Erreur de chargement.";
+            transferButton.disabled = true;
+        });
+    }
+
+    // -----------------------------------------------
+    // Traitement de la Soumission du Formulaire
+    // -----------------------------------------------
+    transferForm.addEventListener('submit', processTransfer);
+
+    function processTransfer(e) {
+        e.preventDefault();
+
+        transferError.hidden = true;
+        transferLoading.hidden = false;
+        transferButton.disabled = true;
+
+        const montantValue = parseFloat(document.getElementById('montant').value);
+        const motifValue   = document.getElementById('motif').value;
+        const dateExecution = document.getElementById('date').value;
+        const ibanValue = document.getElementById('iban').value;
+        const domiciliationValue = document.getElementById('domiciliation').value;
+
+        if (isNaN(montantValue) || montantValue <= 0) {
+            showError("Montant invalide.");
+            return;
+        }
+
+        if (montantValue > currentUserData.balance) {
+            showError("Solde insuffisant.");
+            return;
+        }
+
+        db.runTransaction(async (transaction) => {
+            const clientRef = db.collection(USERS_COLLECTION).doc(userDocId);
+            const clientDoc = await transaction.get(clientRef);
+
+            if (!clientDoc.exists) throw new Error("Compte introuvable.");
+
+            const oldBalance = clientDoc.data().balance || 0;
+            const oldHistory = clientDoc.data().history || [];
+
+            if (oldBalance < montantValue) throw new Error("Solde insuffisant sur le serveur.");
+
+            const newBalance = oldBalance - montantValue;
+
+            const newTransaction = {
+                date: dateExecution,
+                amount: -montantValue,
+                motif: motifValue,
+                type: "Virement Sortant",
+                iban: ibanValue,
+                domiciliation: domiciliationValue,
+                status: "Terminé",
+                timestamp: new Date().toISOString()
+            };
+
+            const newHistory = [...oldHistory, newTransaction];
+
+            transaction.update(clientRef, {
+                balance: newBalance,
+                lastTransfer: firebase.firestore.FieldValue.serverTimestamp(),
+                history: newHistory
+            });
+
+            return { newBalance, newHistory };
+
+        }).then(({ newBalance, newHistory }) => {
+
+            currentUserData.balance = newBalance;
+            saveCurrentUser(currentUserData);
+
+            currentBalanceDisplay.textContent = formatCurrency(newBalance);
+            localStorage.setItem('transactionHistory', JSON.stringify(newHistory));
+
+            return emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, transferForm);
+
+        }).then(() => {
+
+            const params = new URLSearchParams(new FormData(transferForm));
+            params.append("amount_sent", montantValue);
+
+            window.location.href = "confirmation.html?" + params.toString();
+
+        }).catch(err => {
+            console.error(err);
+            showError("Virement annulé : " + err.message);
+            fetchCurrentBalance();
+        });
+    }
+
+    // -----------------------------------------------
+    // Affichage des Erreurs
+    // -----------------------------------------------
+    function showError(msg) {
+        transferError.textContent = msg;
+        transferError.hidden = false;
+        transferLoading.hidden = true;
+        transferButton.disabled = false;
+    }
+    </script>
+</body>
+</html>

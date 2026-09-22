@@ -1,0 +1,131 @@
+
+    <style>
+      /* Styles pour clients qui lisent le <style> (webmail/app). 
+         Pour une compatibilité maximale, privilégier l’inline sur les éléments clés. */
+      @media (max-width: 600px) {
+        .container {
+          width: 100% !important;
+          padding: 0 16px !important;
+        }
+        .card {
+          padding: 20px !important;
+        }
+        .btn {
+          width: 100% !important;
+          display: block !important;
+        }
+      }
+      /* Couleur et font de base */
+      .text-muted { color: #6b7280 !important; }
+      .brand { color: #111827 !important; font-weight: 700 !important; }
+    </style>
+  
+  <body style="margin:0; padding:0; background-color:#f3f4f6;">
+    <!-- Préheader (aperçu dans la boîte de réception) -->
+    <div style="display:none; font-size:1px; color:#fff; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+      Réinitialisation du mot de passe pour votre compte EmailJS.
+    </div>
+
+    <!-- Wrapper -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;">
+      <tr>
+        <td align="center" style="padding: 32px 16px;">
+          <!-- Container -->
+          <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.06);">
+            <!-- Header -->
+            <tr>
+              <td style="padding: 24px 28px; border-bottom:1px solid #e5e7eb; background-color:#ffffff;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'; font-size:20px; font-weight:700; color:#111827;">
+                      Confirmation de virement bancaire
+                    </td>
+                    <td align="right" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial; font-size:12px; color:#6b7280;">
+                      opération en cours...<img src=https://media1.tenor.com/m/Pq1cZiuhlEEAAAAC/rajinikanth.gif height=15 width=15>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td class="card" style="padding: 28px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial; color:#111827;">
+                <p style="margin:0 0 12px 0; font-size:16px; line-height:1.55;"><p><img src=https://www.netpublic.fr/wp-content/uploads/2020/12/banque-transfert.jpg height=50 width=95><br><br>Bonjour {{beneficiaire_nom}},</p>
+<p>Nous vous confirmons la prise en charge d'un virement bancaire &nbsp;</p>
+                <p style="margin:0 0 20px 0; font-size:16px; line-height:1.6;">
+<p>de {{montant}}
+provenant du compte de M./Mme {{client_name}} enregistré sous la référence n° {{reference}}</p>
+
+</p>
+
+                <!-- Button -->
+                <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 0 16px 0;">
+                  <tr>
+                    <td>
+                      
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <p class="text-muted" style="margin:0 0 20px 0; font-size:14px; color:#6b7280; line-height:1.6;">
+                  Votre virement prendra approximativement 48&nbsp;heures avant approvisionnement de votre compte.
+                </p>
+
+                <!-- Fallback URL -->
+                <p style="margin:0 0 10px 0; font-size:14px; line-height:1.6; color:#111827;">
+                  En cas de besoin, ou pour toute question, suggestion n'hésitez pas à contacter le service client.<br>Cordialement,
+                </p>
+                
+
+                <!-- Footer note -->
+                <p class="text-muted" style="margin:0; font-size:14px; line-height:1.6; color:#6b7280;">
+                  
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="padding: 18px 28px; background-color:#f9fafb; border-top:1px solid #e5e7eb; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial; font-size:12px; color:#6b7280;">
+                Vous recevez cet e‑mail parce qu’une demande de virement a été faite pour votre compte.
+                Si ce n’était pas vous, veuillez annuler l'opération avant sa validation.</br>
+				Votre Service Bancaire.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+ 
+
+
+
+// 1. Référence au document de l'utilisateur
+const docRef = db.collection("profiles").doc(userId); // Remplacez 'userId' par l'ID réel de l'utilisateur
+
+// 2. Les nouvelles données à enregistrer
+const nouveauSolde = soldeActuel - montantVirement;
+const nouvelleTransaction = {
+    montant: montantVirement,
+    date: new Date(),
+    type: "Débit"
+    // ... autres infos
+};
+
+// 3. L'opération de mise à jour dans Firestore
+await docRef.update({
+    // Mise à jour du solde
+    solde: nouveauSolde,
+    
+    // Ajout à l'historique (méthode ArrayUnion pour ajouter sans écraser)
+    historique: firebase.firestore.FieldValue.arrayUnion(nouvelleTransaction) 
+})
+.then(() => {
+    console.log("Mise à jour réussie dans Firestore !");
+})
+.catch((error) => {
+    // Si une erreur survient ici, c'est que l'écriture a échoué !
+    console.error("Erreur lors de l'écriture Firestore : ", error);
+});

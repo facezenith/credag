@@ -1,0 +1,21 @@
+2. Étapes Clés pour l'Auto-Réponse avec EmailJS
+Pour que l'auto-réponse fonctionne, vous devez configurer EmailJS :
+
+A. Configuration du Template Client (TEMPLATE_ID_CONFIRM)
+Créer un nouveau Template (Exemple : Confirmation Virement Client).
+
+Dans le corps de l'e-mail, utilisez les variables :
+
+{{client_name}}
+
+{{montant}}
+
+{{beneficiaire_nom}}
+
+{{reference}}
+
+Dans les Paramètres du Template (destinataire) :
+
+Laissez le champ "To Email" (À E-mail) vide.
+
+Dans le champ "To Name" (À Nom), mettez {{client_name}}.

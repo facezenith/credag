@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Portail Démo - Connexion</title>
+    <link rel="shortcut icon" href="https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand: #ff6600;
+            --background: #e6ecf2;
+            --text: #003366;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Nunito', system-ui, sans-serif;
+            background-color: var(--background);
+            background-image: url('https://s3-alpha.figma.com/hub/file/612259599/50cc41a9-9195-4560-a10e-c332efce23a7-cover.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .login-container {
+            width: 350px;
+            padding: 30px 28px 24px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(0, 51, 102, 0.2);
+            text-align: center;
+        }
+
+        .login-container h1 {
+            font-family: 'Montserrat', system-ui, sans-serif;
+            font-size: 22px;
+            margin: 10px 0 4px;
+            color: var(--text);
+        }
+
+        .login-container h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 16px;
+            color: #555;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255, 102, 0, 0.1);
+            color: var(--brand);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .login-container p.disclaimer {
+            font-size: 11px;
+            line-height: 1.4;
+            color: #777;
+            margin-bottom: 18px;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #444;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 11px;
+            margin-top: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: var(--brand);
+            color: #fff;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .status-message {
+            color: #2e7d32;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBQ_plv26CJGbXRs1ngfX1izeFwDDy7_yXFg&s" height="72">
+
+    <div class="demo-badge"></div>
+    <h1>Portail GT BANK</h1>
+    <h2>Connexion client</h2>
+
+    <form id="loginForm">
+        <div class="input-group">
+            <label for="clientCode">Identifiant (Code Client)</label>
+            <input type="text" id="clientCode" required>
+        </div>
+
+        <div class="input-group">
+            <label for="pinCode">Code d’accès (PIN)</label>
+            <input type="password" id="pinCode" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Se connecter</button>
+
+        <p id="errorMessage" class="error-message" hidden>Erreur de connexion</p>
+        <p id="statusMessage" class="status-message" hidden></p>
+    </form>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+    // Configuration Firebase (laissez tel quel)
+    var firebaseConfig = {
+        apiKey: "AIzaSyBhINw6Kzi05YUlOTC-BvaZ9Z5bFSKdHv8",
+        authDomain: "gt-bank-61a8d.firebaseapp.com",
+        projectId: "gt-bank-61a8d",
+        storageBucket: "gt-bank-61a8d.firebasestorage.app",
+        messagingSenderId: "606462957016",
+        appId: "1:606462957016:web:033c303b840af9e4824ead"
+    };
+
+    // Initialisation Firebase et Firestore
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    var db = firebase.firestore();
+
+    var loginForm = document.getElementById('loginForm');
+    var errorMessage = document.getElementById('errorMessage');
+    var statusMessage = document.getElementById('statusMessage');
+    var clientCodeInput = document.getElementById('clientCode');
+    var pinCodeInput = document.getElementById('pinCode');
+
+    // --- CORRECTION MAJEURE: Utiliser la collection 'profiles' ---
+    const USERS_COLLECTION = "profiles";
+    // --- CORRECTION MAJEURE: Clé de stockage pour l'objet complet du profil ---
+    const SESSION_KEY = "ma_banque_currentUserData"; // Utilisé par data.js
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Réinitialiser les messages
+        errorMessage.hidden = true;
+        statusMessage.hidden = true;
+        
+        // Récupérer les valeurs du formulaire
+        var clientCode = clientCodeInput.value.trim();
+        var pinCode = pinCodeInput.value.trim(); // PIN ou Mot de passe (selon l'interface)
+
+        if (!clientCode || !pinCode) {
+            errorMessage.textContent = "Veuillez saisir votre identifiant et votre code d'accès.";
+            errorMessage.hidden = false;
+            return;
+        }
+        
+        // --- LOGIQUE DE VÉRIFICATION FIRESTORE CORRIGÉE ---
+        
+        // 1. Recherche dans la collection 'profiles' par 'demoClientId'
+        db.collection(USERS_COLLECTION)
+            // --- CORRECTION: Cherche par demoClientId (utilisé par Admin) ---
+            .where("demoClientId", "==", clientCode) 
+            .limit(1)
+            .get()
+            .then((querySnapshot) => {
+                if (querySnapshot.empty) {
+                    // Aucune correspondance trouvée pour le Client ID
+                    errorMessage.textContent = "Identifiant ou Code d'accès incorrect.";
+                    errorMessage.hidden = false;
+                    return;
+                }
+                
+                // Récupérer le premier document
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+                
+                // --- CORRECTION: Vérifier le mot de passe dans le champ 'demoPassword' ---
+                if (userData.demoPassword === pinCode) {
+                    // ✅ AUTHENTIFICATION RÉUSSIE
+                    
+                    // Préparation des données pour le stockage local (pour le dashboard)
+                    // Nous devons transformer les champs 'demoClientId', 'demoPassword' en 'clientCode', 'pin'
+                    // pour la compatibilité avec votre script data.js
+                    
+                    // Création de l'objet utilisateur à sauvegarder
+                    const clientData = {
+                        ...userData, // Copie tous les champs du profil
+                        isAuthenticated: true,
+                        isLocked: false,
+                        // Mise à jour des clés pour la compatibilité avec data.js/shared.js
+                        clientCode: userData.demoClientId,
+                        pin: userData.demoPassword,
+                        nom: userData.fullName,
+                        solde: userData.balance,
+                        // Assurez-vous d'ajouter tous les champs nécessaires pour data.js si le tableau de bord en dépend
+                    };
+
+                    // Stocker l'objet utilisateur complet dans le localStorage
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(clientData));
+                    localStorage.setItem('authType', 'client'); // Pour shared.js
+
+                    // Mise à jour de la dernière connexion dans Firestore
+                    userDoc.ref.update({
+                        lastConnection: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        console.log("Dernière connexion mise à jour.");
+                    }).catch(err => {
+                        console.error("Erreur mise à jour connexion:", err);
+                    });
+
+                    // Redirection vers le tableau de bord
+                    statusMessage.textContent = "Connexion réussie. Redirection...";
+                    statusMessage.hidden = false;
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 500); 
+
+                } else {
+                    // Mot de passe incorrect
+                    errorMessage.textContent = "Identifiant ou Code d'accès incorrect.";
+                    errorMessage.hidden = false;
+                }
+            })
+            .catch(err => {
+                console.error("Erreur de connexion Firestore:", err);
+                errorMessage.textContent = "Une erreur est survenue lors de la vérification. Veuillez réessayer.";
+                errorMessage.hidden = false;
+            });
+    });
+</script>
+
+</body>
+</html>

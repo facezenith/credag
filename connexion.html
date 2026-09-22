@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Portail - Connexion Sécurisée</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* [STYLES CSS - Copiés de votre version précédente] */
+        :root {
+            --brand: #ff6600;
+            --background: #e6ecf2;
+            --text: #003366;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Nunito', system-ui, sans-serif;
+            background-color: var(--background);
+            background-image: url('https://s3-alpha.figma.com/hub/file/612259599/50cc41a9-9195-4560-a10e-c332efce23a7-cover.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .login-container {
+            width: 350px;
+            padding: 30px 28px 24px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(0, 51, 102, 0.2);
+            text-align: center;
+        }
+
+        .login-container h1 {
+            font-family: 'Montserrat', system-ui, sans-serif;
+            font-size: 22px;
+            margin: 10px 0 4px;
+            color: var(--text);
+        }
+
+        .login-container h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 16px;
+            color: #555;
+        }
+
+        .demo-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255, 102, 0, 0.1);
+            color: var(--brand);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .login-container p.disclaimer {
+            font-size: 11px;
+            line-height: 1.4;
+            color: #777;
+            margin-bottom: 18px;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #444;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 11px;
+            margin-top: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: var(--brand);
+            color: #fff;
+            transition: opacity 0.3s;
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-message {
+            color: #2e7d32;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBQ_plv26CJGbXRs1ngfX1izeFwDDy7_yXFg&s" height="72">
+
+    <div class="demo-badge">DEMO</div>
+    <h1>Portail GT BANK</h1>
+    <h2>Connexion client</h2>
+
+    <form id="loginForm">
+        <div class="input-group">
+            <label for="clientCode">Identifiant (Code Client)</label>
+            <input type="text" id="clientCode" required>
+        </div>
+
+        <div class="input-group">
+            <label for="pinCode">Code d’accès (PIN)</label>
+            <input type="password" id="pinCode" required>
+        </div>
+
+        <button type="submit" class="btn-primary" id="loginButton">Se connecter</button>
+
+        <p id="errorMessage" class="error-message" hidden>Erreur de connexion</p>
+        <p id="statusMessage" class="status-message" hidden></p>
+    </form>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+    // Configuration Firebase (utiliser la configuration réelle de votre projet)
+    var firebaseConfig = {
+        apiKey: "AIzaSyBXQnoenWmWvYgoKT2qWQfk5j4cVLWZr4Y",
+        authDomain: "acs-v-e6ef3.firebaseapp.com",
+        projectId: "acs-v-e6ef3",
+        storageBucket: "acs-v-e6ef3.firebasestorage.app",
+        messagingSenderId: "849135031406",
+        appId: "1:849135031406:web:88f7deadc5569357d4027f"
+    };
+
+    // Initialisation Firebase et Firestore
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    const errorMessage = document.getElementById('errorMessage');
+    const statusMessage = document.getElementById('statusMessage');
+    const clientCodeInput = document.getElementById('clientCode');
+    const pinCodeInput = document.getElementById('pinCode');
+
+    const USERS_COLLECTION = "profiles";
+    const SESSION_KEY = "ma_banque_currentUserData";
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        errorMessage.hidden = true;
+        statusMessage.hidden = true;
+        loginButton.disabled = true;
+
+        const clientCode = clientCodeInput.value.trim();
+        const pinCode = pinCodeInput.value.trim();
+        
+        if (!clientCode || !pinCode) {
+            errorMessage.textContent = "Veuillez saisir les deux champs.";
+            errorMessage.hidden = false;
+            loginButton.disabled = false;
+            return;
+        }
+        
+        // Requête de connexion
+        db.collection(USERS_COLLECTION)
+            .where("demoClientId", "==", clientCode) 
+            .limit(1)
+            .get()
+            .then((querySnapshot) => {
+                if (querySnapshot.empty) {
+                    errorMessage.textContent = "Identifiant ou Code d'accès incorrect.";
+                    errorMessage.hidden = false;
+                    loginButton.disabled = false;
+                    return;
+                }
+                
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+                
+                if (userData.demoPassword === pinCode) {
+                    // AUTHENTIFICATION RÉUSSIE
+                    
+                    // Création de l'objet utilisateur à sauvegarder
+                    const clientData = {
+                        // Stocker l'ID du document pour les opérations futures (comme le virement)
+                        docId: userDoc.id, 
+                        ...userData,
+                        isAuthenticated: true,
+                        clientCode: userData.demoClientId,
+                        nom: userData.fullName || 'Client',
+                        solde: userData.balance || 0, // Assurez-vous que le champ est 'balance'
+                    };
+
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(clientData));
+                    
+                    // Mise à jour de la dernière connexion (non bloquant)
+                    userDoc.ref.update({
+                        lastConnection: firebase.firestore.FieldValue.serverTimestamp()
+                    }).catch(err => {
+                        console.warn("Mise à jour connexion échouée (non critique):", err);
+                    });
+
+                    statusMessage.textContent = "Connexion réussie. Redirection...";
+                    statusMessage.hidden = false;
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 500); 
+
+                } else {
+                    // Mot de passe incorrect
+                    errorMessage.textContent = "Identifiant ou Code d'accès incorrect.";
+                    errorMessage.hidden = false;
+                    loginButton.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error("Erreur de connexion Firestore:", err);
+                errorMessage.textContent = "Impossible de se connecter au serveur. Vérifiez votre connexion.";
+                errorMessage.hidden = false;
+                loginButton.disabled = false;
+            });
+    });
+</script>
+
+</body>
+</html>

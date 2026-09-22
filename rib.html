@@ -1,0 +1,615 @@
+web_code_canvas:generate_web_app{language: 'HTML', query: '<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Espace client - Mon RIB</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand: #ff6600;
+            --secondary: #003366;
+            --secondary-dark: #002244;
+            --text-dark: #1f2933;
+            --bg-light: #f4f6f9;
+            --border-color: #e0e4f0;
+            --text-muted: #6c757d;
+            --sidebar-width: 250px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 70px; /* Espace pour la navigation mobile Android */
+        }
+
+        /* --- LAYOUT GLOBAL --- */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* --- MENU SLIDE COULISSANT (DRAWER ANDROID) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--secondary);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.15);
+        }
+
+        .logo-section {
+            padding: 20px 15px;
+            text-align: center;
+            background: var(--secondary-dark);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .logo-section img {
+            height: 35px;
+            background: #fff;
+            padding: 4px;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        .logo-section p {
+            font-size: 11px;
+            color: #ccc;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .close-sidebar-btn {
+            display: none;
+            position: absolute;
+            top: 15px; right: 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 15px 0;
+            overflow-y: auto;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #d1dce5;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+        .nav-link.active {
+            background: rgba(255, 102, 0, 0.15);
+            color: #fff;
+            border-left-color: var(--brand);
+        }
+
+        .highlight { background: #ffc107; color: var(--text-dark); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .new-badge { font-size: 9px; margin-left: 5px; background: #dc3545; color: #fff; padding: 2px 5px; border-radius: 3px; font-weight: 800; }
+
+        /* Overlay Sombre Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- MAIN WRAPPER --- */
+        .main-wrapper {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* --- HEADER TOPBAR --- */
+        .header {
+            background: #fff;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+
+        .menu-toggle-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .tabs { display: flex; gap: 15px; }
+        .tab {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            color: var(--secondary);
+            border-bottom-color: var(--brand);
+        }
+
+        .search input {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 220px;
+            font-size: 13px;
+            outline: none;
+            background: var(--bg-light);
+        }
+
+        .icons { font-size: 18px; display: flex; gap: 12px; cursor: pointer; }
+        .icons a { text-decoration: none; color: inherit; }
+
+        /* --- CONTENT AREA --- */
+        .content-area {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+            padding: 25px;
+            flex: 1;
+        }
+
+        /* --- CONTAINER RIB --- */
+        .rib-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            max-width: 750px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .rib-container h2 {
+            color: var(--secondary);
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .rib-subtext {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .rib-title {
+            color: var(--brand);
+            font-size: 15px;
+            font-weight: 800;
+            margin: 20px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-group {
+            background: #fafbfc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 5px 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .info-row:last-child { border-bottom: none; }
+
+        .info-label {
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 14px;
+            min-width: 180px;
+        }
+
+        .info-value {
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .iban-highlight {
+            font-weight: 800;
+            color: var(--brand);
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 0.5px;
+            font-size: 15px;
+        }
+
+        .actions-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .btn:hover { background: #e05c00; }
+
+        .btn-primary {
+            background: var(--secondary);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-dark);
+        }
+
+        /* WIDGETS SIDEBAR DROITE */
+        .right-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+        .widget {
+            background: #fff;
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .widget h4 { color: var(--secondary); margin-bottom: 10px; font-size: 15px; font-weight: 800; }
+        .widget p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+        /* --- BARRE DE NAVIGATION ANDROID (BAS DE PAGE) --- */
+        .mobile-footer-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+            padding: 8px 0;
+            z-index: 900;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+        }
+
+        .mobile-footer-tabs { display: flex; justify-content: space-around; align-items: center; }
+
+        .mobile-tab {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .mobile-tab.active { color: var(--brand); }
+
+        /* --- MEDIA QUERIES RESPONSIVE --- */
+        @media (max-width: 1024px) {
+            .content-area { grid-template-columns: 1fr; }
+            .right-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding-bottom: 70px; }
+            .sidebar { transform: translateX(-100%); width: 270px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; opacity: 1; }
+            .close-sidebar-btn { display: block; }
+            
+            .main-wrapper { margin-left: 0; }
+            .menu-toggle-btn { display: block; }
+            
+            .header { padding: 0 15px; }
+            .tabs { display: none; }
+            .search input { width: 130px; }
+            
+            .content-area { padding: 15px; }
+            
+            .right-sidebar { grid-template-columns: 1fr; }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .info-value { text-align: left; }
+
+            .actions-group { flex-direction: column; }
+            .btn { width: 100%; }
+
+            .mobile-footer-nav { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- Overlay tactile Android -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MENU SLIDE COULISSANT (DRAWER) -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-section">
+            <button class="close-sidebar-btn" id="closeSidebarBtn">✕</button>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM7lGTyAI0yZzf5VJ51yertxgJvZH7m7XmQ&s" alt="Logo">
+            <p>Espace client</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link"><span>📊</span> &nbsp; Comptes & Cartes</a>
+            <a href="credits.html" class="nav-link"><span>🏦</span> &nbsp; Crédits</a>
+            <a href="cartes.html" class="nav-link"><span>💳</span> &nbsp; Cartes</a>
+            <a href="profil.html" class="nav-link"><span>👤</span> &nbsp; Profil</a>
+            <a href="#" class="nav-link"><span class="highlight">Rentabilis 3%</span> <span class="new-badge">NEW</span></a>
+            <a href="virement.html" class="nav-link" style="margin-top: 10px;"><span>💸</span> &nbsp; Virement</a>
+            <a href="ajouter-beneficiaire.html" class="nav-link"><span>➕</span> &nbsp; Ajouter Bénéficiaire</a>
+            <a href="historique.html" class="nav-link"><span>📜</span> &nbsp; Historique</a>
+            <a href="en-ligne.html" class="nav-link"><span>💬</span> &nbsp; Contacter en ligne</a>
+            <a href="#" class="nav-link" id="logoutLink" style="color: #ff8888; margin-top: 15px;"><span>🚪</span> &nbsp; Déconnexion</a>
+        </nav>
+    </aside>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <div class="main-wrapper">
+
+        <!-- HEADER TOPBAR -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle-btn" id="menuToggleBtn">☰</button>
+                <div class="tabs">
+                    <a href="dashboard.html" class="tab">MES COMPTES</a>
+                    <a href="cartes.html" class="tab">MES CARTES</a>
+                    <a href="profil.html" class="tab">MON PROFIL</a>
+                    <a href="rib.html" class="tab active">MON RIB</a>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <div class="search" role="search">
+                    <input placeholder="Recherche..." />
+                </div>
+                <div class="icons">
+                    <span title="phone">📞</span>
+                    <span title="mail"><a href="en-ligne.html">✉️</a></span>
+                    <span title="deconnexion"><a href="deconnexion.html">🔒</a></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ZONE DE CONTENU -->
+        <div class="content-area">
+            <main class="main-content">
+                <div class="rib-container">
+                    <h2>Relevé d'Identité Bancaire (RIB)</h2>
+                    <p class="rib-subtext">Téléchargez ou transmettez ces coordonnées pour recevoir vos virements et prélèvements.</p>
+
+                    <div class="rib-title">
+                        <span>🏦</span> Détails de votre compte
+                    </div>
+                    <div class="info-group">
+                        <div class="info-row">
+                            <span class="info-label">Titulaire du Compte :</span>
+                            <span class="info-value" id="rib-titulaire">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Nom de la Banque :</span>
+                            <span class="info-value" id="rib-bank">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Domiciliation / Agence :</span>
+                            <span class="info-value" id="rib-agency-detail">Chargement...</span>
+                        </div>
+                    </div>
+
+                    <div class="rib-title">
+                        <span>🌐</span> Informations SEPA & Internationales
+                    </div>
+                    <div class="info-group">
+                        <div class="info-row">
+                            <span class="info-label">IBAN (International Account Number) :</span>
+                            <span class="info-value iban-highlight" id="rib-iban">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">BIC / SWIFT (Bank Code) :</span>
+                            <span class="info-value" id="rib-bic">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Code Client :</span>
+                            <span class="info-value" id="rib-client-code">Chargement...</span>
+                        </div>
+                    </div>
+
+                    <div class="actions-group">
+                        <button class="btn btn-primary" onclick="alert('Téléchargement du document RIB au format PDF...')">
+                            <span>📄</span> Télécharger le RIB (PDF)
+                        </button>
+                        <button class="btn" onclick="copyToClipboard('rib-iban')">
+                            <span>📋</span> Copier l'IBAN
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <!-- SIDEBAR DROITE -->
+            <aside class="right-sidebar">
+                <div class="widget">
+                    <h4>Utilisation du RIB</h4>
+                    <p>Votre RIB permet à des tiers (employeurs, organismes, banques) de verser des fonds directement sur votre compte ou de mettre en place un prélèvement automatique autorisé.</p>
+                </div>
+
+                <div class="widget" style="text-align: center;">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvow9EyfSHYEGbCxlZMXPsoaNfnLKqjg0ZpvGkL7bQTYC1kjsNiBHrWhIvlA6Dbp7XfUQ&usqp=CAU" alt="Promotion GTBank" style="width:100%; border-radius:8px; object-fit:cover;">
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!-- BARRE NAVIGATION ANDROID (BAS DE PAGE) -->
+<footer class="mobile-footer-nav">
+    <div class="mobile-footer-tabs">
+        <a href="dashboard.html" class="mobile-tab">
+            <span>📊</span> COMPTES
+        </a>
+        <a href="cartes.html" class="mobile-tab">
+            <span>💳</span> CARTES
+        </a>
+        <a href="virement.html" class="mobile-tab">
+            <span>💸</span> VIREMENT
+        </a>
+        <a href="rib.html" class="mobile-tab active">
+            <span>📄</span> RIB
+        </a>
+    </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="data.js"></script>
+<script src="shared.js"></script>
+
+<script>
+    // --- GESTION DU MENU SLIDE (TACTILE ANDROID) ---
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    if (menuToggleBtn) menuToggleBtn.addEventListener('click', openSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+    // Swipe tactiles mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, false);
+
+    function handleSwipe() {
+        if (touchEndX - touchStartX > 80 && touchStartX < 40) openSidebar();
+        if (touchStartX - touchEndX > 80 && sidebar.classList.contains('open')) closeSidebar();
+    }
+
+    // --- CHARGEMENT ET FORMATAGE DES DONNÉES FIRESTORE / USER ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const currentUser = typeof checkAuth === 'function' ? checkAuth() : null;
+        if (!currentUser) return;
+
+        const titulaire = currentUser.fullName || 'N/A';
+        const bankName = currentUser.bankName || 'GT Bank / GTCO';
+        const address = currentUser.address || 'N/A';
+        const iban = currentUser.iban || currentUser.ibanDemo || 'N/A'; 
+        const bic = currentUser.bicDemo || currentUser.bic || 'N/A';
+        const clientCode = currentUser.demoClientId || currentUser.docId || 'N/A';
+
+        document.getElementById('rib-titulaire').textContent = titulaire;
+        document.getElementById('rib-bank').textContent = bankName;
+        document.getElementById('rib-agency-detail').textContent = address;
+        
+        // Formatage IBAN par paquets de 4 caractères
+        const formattedIban = iban.replace(/\s/g, '').replace(/(\S{4})(?=\S)/g, '$1 ').trim();
+        document.getElementById('rib-iban').textContent = formattedIban;
+        
+        document.getElementById('rib-bic').textContent = bic;
+        document.getElementById('rib-client-code').textContent = clientCode;
+    });
+
+    // --- FONCTION DE COPIE ---
+    function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            const textToCopy = element.textContent.replace(/\s/g, ''); 
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('IBAN copié dans le presse-papiers !');
+            }).catch(err => {
+                console.error('Erreur de copie : ', err);
+            });
+        }
+    }
+</script>
+
+</body>
+</html>`}

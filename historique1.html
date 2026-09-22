@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Espace client - Historique des Opérations</title>
+
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand: #ff6600;
+            --secondary: #003366;
+            --text-dark: #1f2933;
+            --bg-light: #f5f7fb;
+            --border-color: #e0e4f0;
+            --text-muted: #6c757d;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* --- LAYOUT GRID --- */
+        .layout {
+            display: grid;
+            grid-template-columns: 240px 1fr 280px;
+            grid-template-rows: auto 1fr;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            background: var(--secondary);
+            color: #fff;
+            padding: 20px 0;
+            grid-row: 1 / 3;
+        }
+
+        .logo-section { text-align: center; padding-bottom: 20px; }
+        .logo-section img {
+            height: 35px;
+            background: #fff;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .logo-section p { font-size: 12px; margin-top: 6px; color: #ddd; }
+
+        .nav-link {
+            display: block;
+            padding: 12px 20px;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .nav-link.active { background: var(--brand); }
+
+        .nav-link:hover { background: rgba(255,255,255,0.1); }
+
+        .highlight { background: #ffc107; color: #111; padding: 2px 5px; border-radius: 4px; }
+        .new-badge { background: #dc3545; font-size: 10px; padding: 2px 4px; border-radius: 3px; margin-left: 5px; }
+
+        .header {
+            grid-column: 2 / 4;
+            padding: 10px 20px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tabs { display: flex; gap: 15px; }
+        .tab {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 6px 0;
+        }
+        .tab.active {
+            color: var(--secondary);
+            border-bottom: 2px solid var(--brand);
+        }
+
+        .search input {
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 230px;
+        }
+
+        .content-area {
+            grid-column: 2 / 4;
+            display: grid;
+            grid-template-columns: 1fr 280px;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .right-sidebar {
+            background: #fff;
+            padding: 20px;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .widget {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .widget h4 { margin: 0 0 8px; color: var(--secondary); }
+
+        /* --- TABLE HISTORIQUE --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            font-weight: 700;
+            color: var(--secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover { background: #f1f1f1; }
+
+        .amount-credit { color: #28a745; font-weight: 700; }
+        .amount-debit { color: #dc3545; font-weight: 700; }
+
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo-section">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/GTCO_logo.svg/250px-GTCO_logo.svg.png">
+            <p>Espace client</p>
+        </div>
+
+        <nav>
+            <a class="nav-link" href="dashboard.html">Comptes & Cartes</a>
+            <a class="nav-link" href="credits.html">Crédits</a>
+            <a class="nav-link" href="cartes.html">Cartes</a>
+            <a class="nav-link" href="profil.html">Profil</a>
+            <a class="nav-link"><span class="highlight">Rentabilis 3%</span><span class="new-badge">NEW</span></a>
+
+            <a class="nav-link" href="virement.html" style="margin-top:20px;">Virement</a>
+            <a class="nav-link" href="ajouter-beneficiaire.html">Ajouter Bénéficiaire</a>
+
+            <a class="nav-link active" href="historique.html">Historique</a>
+            <a class="nav-link" href="en-ligne.html">Contacter en ligne</a>
+            <a class="nav-link" id="logoutLink">Déconnexion</a>
+        </nav>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="tabs">
+            <a class="tab" href="dashboard.html">MES COMPTES</a>
+            <a class="tab" href="cartes.html">MES CARTES</a>
+            <a class="tab" href="profil.html">MON PROFIL</a>
+            <a class="tab" href="rib.html">MON RIB</a>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:20px;">
+            <div class="search"><input placeholder="Rechercher..." /></div>
+            <div class="icons">📞 ✉️ 🖐️ 📋 🔒</div>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+
+        <div class="main-content">
+
+            <h2>Historique des Opérations</h2>
+            <p style="color:var(--text-muted);margin-top:-5px;">Retrouvez l’ensemble de vos transactions.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Compte</th>
+                        <th>Libellé</th>
+                        <th>Montant</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+
+                <tbody id="history-body">
+                    <tr><td colspan="5" style="text-align:center;">Chargement...</td></tr>
+                </tbody>
+            </table>
+
+            <p id="no-history" style="text-align:center;margin-top:20px;display:none;">
+                Aucune opération enregistrée.
+            </p>
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="right-sidebar">
+            <div class="widget">
+                <h4>Mon Conseiller</h4>
+                <p style="font-weight:700;" id="advisor-name-widget-right">Chargement...</p>
+                <p style="font-size:13px;color:#666;" id="advisor-contact-right">
+                    Contactez-le par téléphone ou email.
+                </p>
+                <div style="text-align:right;">
+                    <a href="profil.html" style="font-size:13px;">Voir le profil complet</a>
+                </div>
+            </div>
+
+            <div class="widget">
+                <h4>FAQ / Aide</h4>
+                <p style="font-size:13px;color:#666;">
+                    Consultez notre base de connaissances.
+                </p>
+                <button class="btn" style="width:100%;background:var(--secondary);color:white;border:0;padding:10px;border-radius:4px;">
+                    Accéder à la FAQ
+                </button>
+            </div>
+
+            <img src="https://linxo.com/wp-content/uploads/2021/07/header-30.png" style="max-width:100%;border-radius:6px;">
+        </div>
+
+    </div>
+</div>
+
+
+<!-- 🔥 FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<!-- Tes fichiers -->
+<script src="shared.js"></script>
+<script src="data.js"></script>
+
+<script>
+/* ---------------------------------------------------------
+   🔥 Chargement FIRESTORE + Fallback LocalStorage
+----------------------------------------------------------*/
+
+function loadHistory() {
+    const historyBody = document.getElementById("history-body");
+    const noHistoryMsg = document.getElementById("no-history");
+
+    const user = checkAuth();
+    if (!user || !user.docId) {
+        historyBody.innerHTML = "<tr><td colspan='5'>Erreur utilisateur.</td></tr>";
+        return;
+    }
+
+    console.log("Chargement Firestore pour :", user.docId);
+
+    db.collection("profiles").doc(user.docId).get()
+        .then(doc => {
+            let history = [];
+
+            if (doc.exists && doc.data().history) {
+                history = doc.data().history;
+                console.log("🔥 Firestore :", history);
+            }
+
+            // 🔄 Fallback localstorage si Firestore vide
+            if (history.length === 0) {
+                history = JSON.parse(localStorage.getItem("transactionHistory")) || [];
+                console.log("📦 LocalStorage :", history);
+            }
+
+            displayHistory(history);
+        })
+        .catch(err => {
+            console.error("Erreur Firestore :", err);
+            historyBody.innerHTML = "<tr><td colspan='5'>Erreur chargement Firestore.</td></tr>";
+        });
+}
+
+/* ---------------------------------------------------------
+   🚀 Affichage HTML du tableau
+----------------------------------------------------------*/
+function displayHistory(history) {
+    const body = document.getElementById("history-body");
+    const noHistory = document.getElementById("no-history");
+
+    if (!history || history.length === 0) {
+        body.innerHTML = "";
+        noHistory.style.display = "block";
+        return;
+    }
+
+    noHistory.style.display = "none";
+
+    history.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    body.innerHTML = history.map(item => {
+        const isDebit = item.amount < 0;
+        const amountClass = isDebit ? "amount-debit" : "amount-credit";
+
+        return `
+            <tr>
+                <td>${item.date}</td>
+                <td>${item.account || "Compte Courant"}</td>
+                <td>${item.label || "Opération"}</td>
+                <td class="${amountClass}">${item.amount} €</td>
+                <td>${item.details || ""}</td>
+            </tr>
+        `;
+    }).join("");
+}
+
+loadHistory();
+</script>
+
+</body>
+</html>

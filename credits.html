@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Espace client - Mes Crédits</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand: #ff6600; /* Orange/Accent pour GTCO */
+            --secondary: #003366; /* Bleu foncé/Sidebar pour GTCO */
+            --text-dark: #1f2933;
+            --bg-light: #f5f7fb;
+            --border-color: #e0e4f0;
+            --text-muted: #6c757d;
+            --green-up: #2e7d32;
+            --red-down: #d32f2f;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', system-ui, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+        
+        /* --- STRUCTURE GLOBALE (Grid du Dashboard) --- */
+        .layout {
+            display: grid;
+            grid-template-columns: 240px 1fr 280px; 
+            grid-template-rows: auto 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+        .sidebar {
+            background: var(--secondary);
+            color: #fff;
+            padding: 20px 0;
+            grid-row: 1 / 3; 
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #fff;
+            grid-column: 2 / 4; 
+            grid-row: 1 / 2;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .content-area {
+            grid-column: 2 / 4; 
+            grid-row: 2 / 3;
+            display: grid;
+            grid-template-columns: 1fr 280px; 
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .right-sidebar {
+            padding: 20px;
+            background: #fff;
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Sidebar & Navigation */
+        .logo-section { padding: 0 20px 20px; text-align: center; }
+        .logo-section img { height: 35px; background: #fff; padding: 5px; border-radius: 4px; }
+        .logo-section p { font-size: 12px; color: #ccc; margin: 5px 0 0; }
+        .nav-link {
+            display: block; padding: 10px 20px; color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; 
+        }
+        .nav-link.active { background: var(--brand); }
+        .nav-link:hover:not(.active) { background: rgba(255, 255, 255, 0.1); }
+        .rentabilis { background: #ffc107; color: var(--text-dark); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; margin-left: 8px; }
+        
+        /* --- Styles spécifiques à la page Crédits --- */
+        .credit-simulator {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+        .credit-simulator h1 {
+            color: var(--secondary);
+            font-size: 24px;
+            border-bottom: 2px solid var(--brand);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: var(--secondary);
+            flex-basis: 40%;
+        }
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            flex-basis: 55%;
+            font-size: 14px;
+        }
+        .btn-simulate {
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn-simulate:hover { background: #e05c00; }
+
+        /* Résultat de la simulation */
+        #result-display {
+            margin-top: 30px;
+            padding: 15px;
+            background: var(--bg-light);
+            border: 1px dashed var(--brand);
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--secondary);
+            display: none; /* Caché par défaut */
+        }
+        #result-display span {
+            color: var(--brand);
+            font-size: 20px;
+            font-weight: 800;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* --- Widget des Cours Boursiers (Nouveau) --- */
+        .stock-widget {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-light);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .stock-widget h4 { 
+            color: var(--secondary); 
+            margin: 0 0 10px; 
+            font-size: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+        .stock-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+        .stock-name { font-weight: 600; }
+        .stock-price { font-weight: 800; }
+        .stock-change {
+            font-weight: 600;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .up { color: var(--green-up); background: #e8f5e9; }
+        .down { color: var(--red-down); background: #ffebee; }
+
+        /* Reste des styles de dashboard.html pour la cohérence */
+        .header input { padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 250px; margin-right: 20px; }
+        .header span { font-size: 20px; }
+        
+    </style>
+</head>
+<body>
+
+<div class="layout">
+    <div class="sidebar">
+        <div class="logo-section">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM7lGTyAI0yZzf5VJ51yertxgJvZH7m7XmQ&s" alt="GTCO Logo">
+            <p>Espace client</p>
+        </div>
+        <nav>
+            <a href="dashboard.html" class="nav-link">Comptes & Cartes</a>
+            <a href="credits.html" class="nav-link active">Crédits</a>
+            <a href="cartes.html" class="nav-link">Cartes</a>
+            <a href="profil.html" class="nav-link">Mon Profil</a>
+            <a href="rib.html" class="nav-link">Mon RIB</a>
+            <a href="virement.html" class="nav-link">Virement</a>
+            <a href="ajouter-beneficiaire.html" class="nav-link">Ajouter Bénéficiaire</a>
+            <a href="historique.html" class="nav-link">Historique</a>
+            <a href="en-ligne.html" class="nav-link">Contacter en ligne</a>
+            <a href="#" class="nav-link" id="logoutLink">Déconnexion</a>
+        </nav>
+    </div>
+
+    <div class="header">
+        <input type="text" placeholder="Saisissez un mot-clé ou une question">
+        <span style="font-size: 20px;">📞 📬 🎁 🔔</span>
+    </div>
+
+    <div class="content-area">
+        <div class="main-content">
+            <div class="credit-simulator">
+                <h1>Simulateur de Crédit Personnel</h1>
+                <p style="color:var(--text-muted)">Estimez rapidement vos mensualités et le coût total de votre projet.</p>
+
+                <div class="form-group">
+                    <label for="montant">Montant du prêt (€) :</label>
+                    <input type="number" id="montant" value="10000" min="1000" step="500">
+                </div>
+
+                <div class="form-group">
+                    <label for="duree">Durée (années) :</label>
+                    <input type="number" id="duree" value="5" min="1" max="15">
+                </div>
+
+                <div class="form-group">
+                    <label for="type-credit">Type de crédit :</label>
+                    <select id="type-credit">
+                        <option value="4.0">Prêt Auto (4.0%)</option>
+                        <option value="6.5">Crédit Travaux (6.5%)</option>
+                        <option value="3.5">Prêt Personnel (3.5%)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="taux-assurance">Taux Assurance (annuel) :</label>
+                    <input type="number" id="taux-assurance" value="0.25" step="0.01">
+                </div>
+                
+                <button class="btn-simulate" id="simulate-button">Calculer mes mensualités</button>
+
+                <div id="result-display">
+                    <p>Mensualité Estimée : <span id="mensualite">...</span></p>
+                    <p>Coût Total du Crédit : <span id="cout-total">...</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-sidebar">
+            <div class="stock-widget">
+                <h4>Cours Boursiers (Simulés)</h4>
+                <div id="stock-list">
+                    </div>
+            </div>
+
+            <div class="ad-card">
+                <img src="https://c0.lestechnophiles.com/www.frandroid.com/wp-content/uploads/2018/08/Screenshot-2-320.jpg?key=3542326d" alt="Offre Prêt Taux Zéro"height="275" Width="230">
+                <p style="font-size: 13px; text-align: center; color: var(--text-muted);">Découvrez nos offres spéciales pour les jeunes actifs.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="data.js"></script>
+<script src="shared.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = checkAuth();
+        if (!currentUser) return;
+
+        // Mise à jour de la barre de navigation et des titres (non utilisé ici, mais bonne pratique)
+        
+        // --- 1. Logique de Simulation de Crédit ---
+        const simulateButton = document.getElementById('simulate-button');
+        const montantInput = document.getElementById('montant');
+        const dureeInput = document.getElementById('duree');
+        const typeCreditSelect = document.getElementById('type-credit');
+        const assuranceInput = document.getElementById('taux-assurance');
+        const resultDisplay = document.getElementById('result-display');
+        const mensualiteSpan = document.getElementById('mensualite');
+        const coutTotalSpan = document.getElementById('cout-total');
+
+        simulateButton.addEventListener('click', function() {
+            const capital = parseFloat(montantInput.value);
+            const dureeAnnees = parseFloat(dureeInput.value);
+            const tauxAnnuel = parseFloat(typeCreditSelect.value) / 100;
+            const tauxAssuranceAnnuel = parseFloat(assuranceInput.value) / 100;
+
+            if (isNaN(capital) || isNaN(dureeAnnees) || isNaN(tauxAnnuel) || isNaN(tauxAssuranceAnnuel) || capital <= 0 || dureeAnnees <= 0) {
+                alert("Veuillez entrer des valeurs valides.");
+                return;
+            }
+
+            const dureeMois = dureeAnnees * 12;
+            const tauxMensuel = tauxAnnuel / 12;
+
+            // Calcul de la mensualité hors assurance (Formule des annuités)
+            let mensualiteHorsAssurance;
+            if (tauxMensuel === 0) {
+                mensualiteHorsAssurance = capital / dureeMois;
+            } else {
+                mensualiteHorsAssurance = capital * tauxMensuel / (1 - Math.pow(1 + tauxMensuel, -dureeMois));
+            }
+
+            // Calcul de la prime d'assurance mensuelle (calcul simple sur capital initial)
+            const primeAssuranceMensuelle = (capital * tauxAssuranceAnnuel) / 12;
+
+            // Mensualité Totale
+            const mensualiteTotale = mensualiteHorsAssurance + primeAssuranceMensuelle;
+            
+            // Coût Total
+            const coutTotalInterets = (mensualiteHorsAssurance * dureeMois) - capital;
+            const coutTotalAssurance = primeAssuranceMensuelle * dureeMois;
+            const coutTotalCredit = coutTotalInterets + coutTotalAssurance;
+
+            // Affichage des résultats (en utilisant la fonction formatCurrency de shared.js)
+            mensualiteSpan.textContent = formatCurrency(mensualiteTotale);
+            coutTotalSpan.textContent = formatCurrency(coutTotalCredit);
+
+            resultDisplay.style.display = 'block';
+        });
+
+        // --- 2. Logique des Cours Boursiers Simulés (Statiques pour l'exemple) ---
+        const stockData = [
+            { name: 'TotalEnergies', price: 62.50, change: 0.85, up: true },
+            { name: 'LVMH', price: 795.20, change: -1.45, up: false },
+            { name: 'Sanofi', price: 92.15, change: 0.12, up: true },
+            { name: 'Airbus', price: 165.90, change: 3.20, up: true },
+            { name: 'Crédit Agricole', price: 13.40, change: -0.05, up: false },
+        ];
+
+        const stockList = document.getElementById('stock-list');
+        stockData.forEach(stock => {
+            const item = document.createElement('div');
+            item.className = 'stock-item';
+            
+            const changeClass = stock.up ? 'up' : 'down';
+            const changeSign = stock.up ? '+' : '';
+
+            item.innerHTML = `
+                <span class="stock-name">${stock.name}</span>
+                <span class="stock-price">${stock.price.toFixed(2)} €</span>
+                <span class="stock-change ${changeClass}">${changeSign}${stock.change.toFixed(2)} %</span>
+            `;
+            stockList.appendChild(item);
+        });
+
+    });
+</script>
+
+</body>
+</html>

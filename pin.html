@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Connexion - Code PIN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <script src="data.js"></script>
+    <div class="auth-container">
+        <div class="logo" style="margin-bottom: 20px;">Ma BANQUE</div>
+        <h2>Veuillez entrer votre Code PIN (6 chiffres)</h2>
+
+        <form id="pinForm">
+            <input type="password" id="pinInput" name="pin" required maxlength="6" class="pin-input" readonly placeholder="______">
+            <p id="error-message" style="color: var(--brand); margin-top: 10px;" hidden></p>
+
+            <div class="keypad">
+                <button type="button" data-key="1">1</button>
+                <button type="button" data-key="2">2</button>
+                <button type="button" data-key="3">3</button>
+                <button type="button" data-key="4">4</button>
+                <button type="button" data-key="5">5</button>
+                <button type="button" data-key="6">6</button>
+                <button type="button" data-key="7">7</button>
+                <button type="button" data-key="8">8</button>
+                <button type="button" data-key="9">9</button>
+                <button type="button" data-key="clear" class="action-key">Effacer</button>
+                <button type="button" data-key="0">0</button>
+                <button type="submit" data-key="enter" class="action-key">Entrer</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pinInput = document.getElementById('pinInput');
+            const pinForm = document.getElementById('pinForm');
+            const errorMessage = document.getElementById('error-message');
+            const tempClientCode = localStorage.getItem('tempClientCode');
+            const authType = localStorage.getItem('authType');
+
+            // Redirection si pas de code client
+            if (!tempClientCode || !authType) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Clavier Numérique Logic
+            document.querySelectorAll('.keypad button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const key = e.currentTarget.getAttribute('data-key');
+                    errorMessage.hidden = true;
+
+                    if (!isNaN(key) && pinInput.value.length < 6) {
+                        pinInput.value += key;
+                    } else if (key === 'clear') {
+                        pinInput.value = '';
+                    } else if (key === 'enter') {
+                        pinForm.dispatchEvent(new Event('submit'));
+                    }
+                });
+            });
+
+            // Soumission du formulaire
+            pinForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const pin = pinInput.value;
+                let targetUser;
+
+                if (authType === 'user') {
+                    targetUser = getCurrentUser();
+                } else if (authType === 'admin') {
+                    targetUser = getAdminAuth();
+                }
+                
+                if (pin.length === 6 && targetUser && pin === targetUser.pin) {
+                    localStorage.setItem('isAuthenticated', 'true');
+                    // Nettoyage des données temporaires
+                    localStorage.removeItem('tempClientCode');
+                    
+                    if (authType === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                } else {
+                    errorMessage.textContent = "PIN incorrect. Veuillez réessayer.";
+                    errorMessage.hidden = false;
+                    pinInput.value = ''; // Effacer pour recommencer
+                }
+            });
+        });
+    </script>
+</body>
+</html>

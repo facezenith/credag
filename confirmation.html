@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Espace client - Confirmation Virement</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- DÉFINITIONS DES VARIABLES ET BASE --- */
+        :root {
+            --brand: #ff6600;
+            --secondary: #003366;
+            --text-dark: #1f2933;
+            --bg-light: #f5f7fb;
+            --border-color: #e0e4f0;
+            --text-muted: #6c757d;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', system-ui, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+        
+        /* --- STRUCTURE GLOBALE (Grid du Dashboard) --- */
+        .app {
+            display: grid;
+            grid-template-columns: 240px 1fr; /* Supprime la colonne droite pour cette page */
+            grid-template-rows: auto 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+        .left { 
+            background: var(--secondary); 
+            color: #fff; 
+            padding: 20px 0; 
+            grid-row: 1 / 3; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .main { 
+            grid-column: 2 / 3; 
+            grid-row: 1 / 3; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .topbar { 
+            background: #fff; 
+            padding: 10px 20px; 
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .content { 
+            flex-grow: 1; 
+            padding: 20px; 
+        }
+
+        /* Styles de navigation simples */
+        .logo-section { padding: 0 20px 20px; text-align: center; }
+        .logo-section img { height: 35px; background: #fff; padding: 5px; border-radius: 4px; }
+        nav a { display: block; padding: 10px 20px; color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
+        nav a:hover { background: rgba(255, 255, 255, 0.1); }
+        .muted-sep { border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 15px 20px; }
+        
+        /* --- Styles Confirmation Page --- */
+        .confirmation-page { 
+            text-align: center; 
+            padding: 50px 20px; 
+            background: white; 
+            border-radius: 8px; 
+            max-width: 650px; 
+            margin: 40px auto; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .confirmation-page h2 { 
+            color: #28a745; /* Vert Succès */
+            border-bottom: 2px solid #28a745; 
+            padding-bottom: 10px; 
+            margin-bottom: 30px; 
+            font-size: 28px;
+        }
+        .confirmation-page .summary-box { 
+            background: var(--bg-light); 
+            padding: 25px; 
+            border-radius: 8px; 
+            margin: 30px 0; 
+            text-align: left; 
+            width: 100%;
+            display: inline-block; 
+            border: 1px solid var(--border-color);
+        }
+        .confirmation-page .summary-box p { margin: 10px 0; display: flex; justify-content: space-between; }
+        .confirmation-page .summary-box strong { color: var(--secondary); font-weight: 600; flex-basis: 40%; }
+        .confirmation-page .summary-box span { text-align: right; flex-basis: 60%; }
+
+        /* Boutons */
+        .btn { 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            text-decoration: none; 
+            display: inline-block; 
+            transition: background-color 0.3s;
+            font-weight: 600;
+        }
+        .btn-primary { 
+            background: var(--brand); 
+            color: white; 
+            margin-right: 15px;
+        }
+        .btn-primary:hover {
+            background: #e65c00;
+        }
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #002244;
+        }
+
+        /* --- Media Queries --- */
+        @media (max-width: 1024px) {
+            .app { grid-template-columns: 240px 1fr; max-width: none; }
+            .main { grid-column: 2 / 3; }
+        }
+        @media (max-width: 600px) {
+            .app { grid-template-columns: 1fr; }
+            .left { display: none; }
+            .main { grid-column: 1 / 2; }
+            .confirmation-page {
+                margin: 20px auto;
+                padding: 30px 15px;
+            }
+            .confirmation-page .summary-box p {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .confirmation-page .summary-box strong {
+                flex-basis: 100%;
+            }
+            .confirmation-page .summary-box span {
+                text-align: left;
+                margin-top: 2px;
+                display: block;
+            }
+            .btn {
+                display: block;
+                width: 100%;
+                margin: 10px 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="left">
+            <div class="logo-section">
+                <div class="logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM7lGTyAI0yZzf5VJ51yertxgJvZH7m7XmQ&s" height="75" alt="GTCO Logo"></div>
+                <div class="slogan">Espace client</div>
+            </div>
+            <nav>
+                <a href="dashboard.html">Comptes &amp; Cartes</a>
+                <a href="#">Crédits (Simulé)</a>
+                <a href="cartes.html">Cartes</a>
+                <a href="profil.html">Profil</a>
+            </nav>
+            <div class="muted-sep"></div>
+            <nav>
+                <a href="virement.html">Virement</a>
+                <a href="ajouter-beneficiaire.html">Ajouter Bénéficiaire</a>
+                <a href="historique.html">Historique</a>
+                <a href="en-ligne.html">Contacter en ligne</a>
+                <a href="#" id="logoutLink">Déconnexion</a>
+            </nav>
+            <div style="flex:1"></div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <h1>Confirmation de Virement</h1>
+            </header>
+
+            <section class="content">
+                <div class="confirmation-page">
+                    <h2>✅ Virement Enregistré !</h2>
+                    <p>Votre demande de virement a été transmise avec succès au service de gestion. **Vous recevrez une notification par email** de la part de l'équipe de support une fois la transaction vérifiée et traitée.</p>
+                            
+                    <div class="summary-box">
+                        <p><strong>Montant envoyé :</strong> <span id="confirmMontant">--</span></p>
+                        <p><strong>Motif de l'opération :</strong> <span id="confirmMotif">--</span></p>
+                        <p><strong>IBAN Bénéficiaire :</strong> <span id="confirmIBAN">--</span></p>
+                        <p><strong>Domiciliation :</strong> <span id="confirmDomiciliation">--</span></p>
+                        <p><strong>Date d'exécution :</strong> <span id="confirmDate">--</span></p>
+                    </div>
+                            
+                    <a href="dashboard.html" class="btn btn-primary">Retour au Tableau de Bord</a>
+                    <a href="historique.html" class="btn btn-secondary">Voir l'Historique</a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="shared.js"></script> 
+
+    <script>
+        // NOTE: formatCurrency est supposée être définie dans shared.js
+
+        // Fonction pour enregistrer la transaction dans le localStorage après confirmation
+        function saveTransactionToLocalHistory(params) {
+            // Création d'un objet transaction basé sur les paramètres de l'URL
+            const transaction = {
+                ref: 'TRF-' + (Math.floor(Math.random() * 9000) + 1000),
+                date: params.get('date') || new Date().toLocaleDateString('fr-FR'),
+                recipient: params.get('domiciliation') || 'Bénéficiaire Externe',
+                type: 'Virement Sortant',
+                iban: params.get('iban') || 'N/A',
+                bic: params.get('bic') || 'N/A',
+                amount: -Math.abs(parseFloat(params.get('montant'))), // Le montant doit être négatif pour un débit
+                motif: params.get('motif') || 'Virement',
+                status: 'EN ATTENTE' // Statut initial en attendant la vérification par email
+            };
+
+            // Récupérer l'historique existant ou initialiser un nouveau tableau
+            let history = JSON.parse(localStorage.getItem('transactionHistory')) || [];
+
+            // Ajouter la nouvelle transaction en tête
+            history.unshift(transaction);
+
+            // Sauvegarder l'historique mis à jour
+            localStorage.setItem('transactionHistory', JSON.stringify(history));
+
+            // Simuler la mise à jour du solde (si l'utilisateur a un solde stocké)
+            // C'est une simulation Front-end pour l'affichage immédiat sur le Dashboard.
+            let currentBalance = parseFloat(localStorage.getItem('userBalance')) || 0;
+            currentBalance += transaction.amount; // Soustraire le montant
+            localStorage.setItem('userBalance', currentBalance.toFixed(2));
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Vérification de l'authentification
+            if (!checkAuth()) return; // checkAuth est supposé gérer la redirection si nécessaire
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const montant = urlParams.get('montant');
+
+            // Si le montant est manquant, rediriger pour éviter d'afficher une confirmation vide
+            if (!montant) {
+                console.error("Paramètres de virement manquants. Redirection vers le dashboard.");
+                window.location.href = 'dashboard.html'; 
+                return;
+            }
+
+            // 1. Afficher les détails de la confirmation
+            // Utiliser Math.abs() pour s'assurer que le montant affiché n'est pas négatif
+            document.getElementById('confirmMontant').textContent = formatCurrency(Math.abs(montant));
+            document.getElementById('confirmMotif').textContent = urlParams.get('motif') || 'Non spécifié';
+            
+            // Masquer le milieu de l'IBAN pour la sécurité de l'affichage
+            const fullIBAN = urlParams.get('iban') || 'N/A';
+            const displayIBAN = fullIBAN.length > 10 ? fullIBAN.slice(0, 4) + '... ' + fullIBAN.slice(-4) : fullIBAN;
+            document.getElementById('confirmIBAN').textContent = displayIBAN;
+
+            document.getElementById('confirmDomiciliation').textContent = urlParams.get('domiciliation') || 'N/A';
+            document.getElementById('confirmDate').textContent = urlParams.get('date') || 'Aujourd\'hui';
+            
+            // 2. Enregistrer la transaction dans le LocalStorage
+            saveTransactionToLocalHistory(urlParams);
+        });
+    </script>
+</body>
+</html>

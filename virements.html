@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Espace client - Effectuer un Virement</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; color: var(--text-dark); }
+        .form-group input, .form-group select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
+        .form-actions { margin-top: 20px; }
+        .info-box { padding: 15px; background: #f0f0f0; border-radius: 4px; margin-bottom: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="left">
+            <div><div class="logo">Ma BANQUE</div><div class="slogan">Espace client</div></div>
+            <nav>
+                <a href="dashboard.html">Comptes &amp; Cartes</a>
+                <a href="#">Crédits (Simulé)</a>
+                <a href="cartes.html">Cartes</a>
+                <a href="profil.html">Profil</a>
+                <a href="#"><span class="highlight">Rentabilis 3% </span><span class="new-badge">NEW</span></a>
+            </nav>
+            <div class="muted-sep"></div>
+            <nav>
+                <a href="virement.html" class="active">Virement</a>
+                <a href="ajouter-beneficiaire.html">Ajouter Bénéficiaire</a>
+				<a href="historique.html">Historique</a>
+                <a href="en-ligne.html">Contacter en ligne</a>
+                <a href="#" id="logoutLink">Déconnexion</a>
+            </nav>
+            <div style="flex:1"></div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div style="display:flex;align-items:center;gap:18px">
+                    <div class="tabs">
+                        <a href="dashboard.html" class="tab active">MES COMPTES</a>
+                        <a href="cartes.html" class="tab">MES CARTES</a>
+                        <a href="profil.html" class="tab">MON PROFIL</a>
+                        <a href="rib.html" class="tab">MON RIB</a>
+                    </div>
+                </div>
+                <div class="search" role="search"><input placeholder="Saisissez un mot-clé ou une question" /></div>
+                <div class="icons">
+                    <div class="icon" title="phone">📞</div>
+                    <div class="icon" title="mail"><a href="en-ligne.html">✉️</a></div>
+                    <div class="icon" title="help">🖐️</div>
+                    <div class="icon" title="contact@gtb-co.online">📋</div>
+                    <div class="icon" title="espace"><a href="deconnexion.html">🔒</a></div>
+                </div>
+            </header>
+
+            <section class="content">
+                <div class="center">
+                    <div class="section">
+                        <h3>Effectuer un Virement Instantané</h3>
+                        <p style="font-size:14px; color: var(--text-muted); margin-bottom: 20px;">Veuillez renseigner les détails du virement.</p>
+
+                        <div class="info-box">Solde disponible : <span id="account-solde">...</span></div>
+                        <div id="virement-message" style="color: var(--brand); margin-bottom: 15px;" hidden></div>
+
+                        <form id="transfer-form">
+                            
+                            <div class="form-group">
+                                <label for="beneficiary-select">Bénéficiaire :</label>
+                                <select id="beneficiary-select" required>
+                                    <option value="">-- Sélectionnez un bénéficiaire --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="amount">Montant (EUR) :</label>
+                                <input type="number" id="amount" required min="1" step="0.01" placeholder="Ex: 500.00">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="motif">Motif du Virement :</label>
+                                <input type="text" id="motif" required maxlength="100" placeholder="Ex: Remboursement, Loyer, Achat">
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Confirmer le Virement</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <aside class="right">
+                    <div class="widget">
+                        <h4 style="color:var(--accent);margin:0 0 8px">Virement</h4>
+                        <p style="font-size:13px;color:#666;margin-top:6px">Un code de sécurité sera demandé pour finaliser l'opération.</p>
+                    </div></br><img src=https://optimise2.assets-servd.host/gtbank-ci/production/general/Instagram-post-14.png?w=700&q=100&auto=format&fit=max&dm=1707299231&s=cf813cddf1f6e205e03930685c741e2d height=240 width=270>
+                </aside>
+            </section>
+        </main>
+    </div>
+    <footer><p style="text-align: center; font-size: 12px; color: #777; padding: 10px;">© Ma BANQUE - TOUS DROITS RESERVES</p></footer>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script src="data.js"></script>
+    <script src="shared.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = checkAuth();
+            if (!currentUser) return;
+
+            document.getElementById('account-solde').textContent = formatCurrency(currentUser.solde);
+
+            // Remplir la liste des bénéficiaires
+            const select = document.getElementById('beneficiary-select');
+            currentUser.beneficiaries.forEach(b => {
+                const option = document.createElement('option');
+                option.value = b.iban; 
+                option.textContent = `${b.name} (${b.bank || b.bic})`;
+                // Stocke les détails complets dans l'option pour une récupération facile
+                option.dataset.benefName = b.name;
+                option.dataset.benefIBAN = b.iban;
+                select.appendChild(option);
+            });
+
+            const form = document.getElementById('transfer-form');
+            const messageDiv = document.getElementById('virement-message');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                messageDiv.hidden = true;
+                
+                const amount = parseFloat(document.getElementById('amount').value);
+                const motif = document.getElementById('motif').value.trim();
+                const selectedOption = select.options[select.selectedIndex];
+
+                // 1. Vérification du Solde
+                if (amount > currentUser.solde) {
+                    messageDiv.textContent = "❌ Solde insuffisant pour effectuer ce virement.";
+                    messageDiv.hidden = false;
+                    return;
+                }
+
+                // 2. Collecte des détails pour la page de confirmation
+                const virementDetails = {
+                    amount: amount,
+                    motif: motif,
+                    benefName: selectedOption.dataset.benefName,
+                    benefIBAN: selectedOption.dataset.benefIBAN
+                };
+
+                // 3. Stockage temporaire (clef essentielle pour confirmation.html)
+                localStorage.setItem('tempVirementDetails', JSON.stringify(virementDetails));
+
+                // 4. Redirection (Simule le passage de sécurité SMS/code)
+                messageDiv.textContent = "Virement prêt à être confirmé. Redirection en cours...";
+                messageDiv.hidden = false;
+                setTimeout(() => {
+                    window.location.href = 'confirmation.html';
+                }, 1500); 
+            });
+        });
+    </script>
+</body>
+</html>

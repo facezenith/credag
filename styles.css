@@ -1,0 +1,365 @@
+/* styles.css */
+:root {
+    --brand: #e60000; /* Rouge vif pour les alertes/bloqué */
+    --accent: #C9B4ED; /* Bleu pour l'actif/principal */
+    --text-dark: #333;
+    --text-muted: #777;
+    --bg-light: #F5E9E4;
+    --sidebar-bg: #E3764F;
+    --border-color: #F59987;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar (left) */
+.left {
+    width: 280px;
+    background: var(--sidebar-bg);
+    padding: 30px 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--accent);
+}
+
+.slogan {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 30px;
+}
+
+.left nav a {
+    display: block;
+    padding: 12px 10px;
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.left nav a:hover, .left nav a.active {
+    background: #f0f8ff;
+    color: var(--accent);
+}
+
+.muted-sep {
+    border-top: 1px solid var(--border-color);
+    margin: 20px 0;
+}
+
+.highlight {
+    color: var(--brand);
+    font-weight: 800;
+}
+
+.new-badge {
+    background: var(--brand);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-left: 5px;
+    font-weight: 600;
+}
+
+/* Main Content (main) */
+.main {
+    flex: 1;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tabs a {
+    text-decoration: none;
+    color: var(--text-muted);
+    padding: 10px 15px;
+    font-weight: 600;
+    transition: color 0.2s, border-bottom 0.2s;
+}
+
+.tabs a.active {
+    color: var(--accent);
+    border-bottom: 3px solid var(--accent);
+}
+
+.search input {
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    width: 300px;
+}
+
+.icons .icon {
+    display: inline-block;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+.content {
+    display: flex;
+    flex: 1;
+    padding: 30px;
+}
+
+.center {
+    flex: 3;
+    padding-right: 30px;
+}
+
+.right {
+    flex: 1;
+    min-width: 250px;
+}
+
+.section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+}
+
+h3 {
+    margin: 0 0 15px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.account {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: #fcfcfc;
+}
+
+.acc-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.acc-title {
+    font-weight: 800;
+}
+
+.acc-balance {
+    font-size: 24px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.btn {
+    text-decoration: none;
+    background: #f0f0f0;
+    color: var(--text-dark);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s;
+    display: inline-block;
+}
+
+.btn:hover {
+    background: #e0e0e0;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.lock-alert {
+    border: 1px solid var(--brand);
+    background: #ffe0e0;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 15px;
+}
+
+.lock-alert h3 {
+    color: var(--brand);
+    margin-top: 0;
+}
+
+.lock-message {
+    font-weight: 600;
+    color: var(--brand);
+    font-size: 14px;
+}
+
+.widget {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.dot {
+    height: 8px;
+    width: 8px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/* Styles for Forms and Tables (General) */
+form label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+form input, form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table th, table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-size: 14px;
+}
+
+table th {
+    background-color: #f8f8f8;
+    font-weight: 800;
+}
+
+/* Login/PIN page specific */
+.auth-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.pin-input {
+    letter-spacing: 10px;
+    text-align: center;
+    font-size: 24px !important;
+    padding: 10px !important;
+    font-weight: bold;
+}
+
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.keypad button {
+    padding: 15px;
+    font-size: 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.keypad button:hover {
+    background-color: #e0e0e0;
+}
+
+.keypad .action-key {
+    background-color: var(--accent);
+    color: white;
+}
+
+.keypad .action-key:hover {
+    background-color: #0056b3;
+}
+
+/* Admin Specific */
+.admin-section {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    background: #f9f9f9;
+}
+
+.admin-action-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.admin-action-btn:hover {
+    background: #1e7e34;
+}
+
+.delete-btn {
+    background: var(--brand);
+}
+
+.delete-btn:hover {
+    background: #c82333;
+}

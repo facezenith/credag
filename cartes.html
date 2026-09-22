@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Espace client - Mes Cartes</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand: #ff6600;
+            --secondary: #003366;
+            --secondary-dark: #002244;
+            --text-dark: #1f2933;
+            --bg-light: #f5f7fb;
+            --border-color: #e0e4f0;
+            --text-muted: #6c757d;
+            --sidebar-width: 250px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- LAYOUT GLOBAL --- */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* --- MENU SLIDE / SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--secondary);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .logo-section {
+            padding: 20px 15px;
+            text-align: center;
+            background: var(--secondary-dark);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .logo-section img {
+            height: 38px;
+            background: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+
+        .logo-section p {
+            font-size: 11px;
+            color: #ccc;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .close-sidebar-btn {
+            display: none;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 15px 0;
+            overflow-y: auto;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #d1dce5;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background: rgba(255, 102, 0, 0.15);
+            color: #fff;
+            border-left-color: var(--brand);
+        }
+
+        /* Overlay sombre pour fermeture du menu au toucher sur Android */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- MAIN WRAPPER --- */
+        .main-wrapper {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* --- HEADER TOP --- */
+        .header {
+            background: #fff;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-toggle-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .search input {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 250px;
+            font-size: 13px;
+            outline: none;
+            background: var(--bg-light);
+        }
+
+        .icons {
+            font-size: 18px;
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        /* --- CONTENU DE LA PAGE --- */
+        .content-container {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+            padding: 25px;
+            flex: 1;
+        }
+
+        .card-container {
+            max-width: 100%;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-display {
+            width: 100%;
+            max-width: 380px;
+            height: 230px;
+            background: linear-gradient(135deg, #02479e, #1377e8);
+            border-radius: 15px;
+            padding: 22px;
+            color: white;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 51, 102, 0.3);
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .card-display.mastercard {
+            background: linear-gradient(135deg, #FF6600, #E65C00);
+            box-shadow: 0 10px 25px rgba(255, 102, 0, 0.4);
+        }
+
+        .card-type-logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            text-align: right;
+            letter-spacing: 1px;
+        }
+
+        .card-number {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 22px;
+            letter-spacing: 2px;
+            line-height: 1.3;
+        }
+
+        .card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .card-holder-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .card-expiry {
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+
+        .info-group p { 
+            margin: 10px 0; 
+            font-size: 14px;
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn { 
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 11px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            flex: 1;
+            text-align: center;
+        }     
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .widget {         
+            background: #fff;
+            padding: 18px;            
+            border-radius: 8px;            
+            border: 1px solid var(--border-color);        
+        }
+
+        /* --- BARRE DE NAVIGATION INFÉRIEURE POUR ANDROID --- */
+        .mobile-footer-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+            padding: 8px 0;
+            z-index: 900;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .mobile-footer-tabs {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .mobile-tab {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .mobile-tab.active {
+            color: var(--brand);
+        }
+
+        /* ========================================================== */
+        /* --- MEDIA QUERIES (TÉLÉPHONES ANDROID ET TABLETTES) --- */
+        /* ========================================================== */
+
+        @media (max-width: 900px) {
+            .content-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Activation du menu slide */
+            .sidebar {
+                transform: translateX(-100%);
+                width: 270px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+                opacity: 1;
+            }
+
+            .close-sidebar-btn {
+                display: block;
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+                padding-bottom: 60px;
+            }
+
+            .menu-toggle-btn {
+                display: block;
+            }
+
+            .header {
+                padding: 0 15px;
+            }
+
+            .search input {
+                width: 140px;
+            }
+
+            .content-container {
+                padding: 15px;
+            }
+
+            .card-display {
+                width: 100%;
+                height: 210px;
+                padding: 18px;
+            }
+
+            .card-number {
+                font-size: 18px;
+            }
+
+            .info-group p {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .info-group span {
+                text-align: left;
+            }
+
+            .mobile-footer-nav {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- Overlay sombre tactile pour fermer le menu -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR / MENU SLIDE COULISSANT -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-section">
+            <button class="close-sidebar-btn" id="closeSidebarBtn">✕</button>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM7lGTyAI0yZzf5VJ51yertxgJvZH7m7XmQ&s" alt="Logo">
+            <p>Espace client</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link"><span>📊</span> &nbsp; Comptes & Cartes</a>
+            <a href="credits.html" class="nav-link"><span>🏦</span> &nbsp; Crédits</a>
+            <a href="cartes.html" class="nav-link active"><span>💳</span> &nbsp; Cartes</a>
+            <a href="profil.html" class="nav-link"><span>👤</span> &nbsp; Profil</a>
+            <a href="virement.html" class="nav-link"><span>💸</span> &nbsp; Virement</a>
+            <a href="ajouter-beneficiaire.html" class="nav-link"><span>➕</span> &nbsp; Ajouter Bénéficiaire</a>
+            <a href="historique.html" class="nav-link"><span>📜</span> &nbsp; Historique</a>
+            <a href="en-ligne.html" class="nav-link"><span>💬</span> &nbsp; Contacter en ligne</a>
+            <a href="index.html" class="nav-link" id="logoutLink" style="color: #ff8888; margin-top: 15px;"><span>🚪</span> &nbsp; Déconnexion</a>
+        </nav>
+    </aside>
+
+    <!-- WRAPPER PRINCIPAL -->
+    <div class="main-wrapper">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <!-- Bouton Hamburger (Commande tactile Android) -->
+                <button class="menu-toggle-btn" id="menuToggleBtn">☰</button>
+                <div class="search">
+                    <input placeholder="Rechercher..." />
+                </div>
+            </div>
+            <div class="icons">
+                <span>📞</span>
+                <span>✉️</span>
+                <span>🔒</span>
+            </div>
+        </header>
+
+        <!-- ZONE DE CONTENU -->
+        <div class="content-container">
+            <main class="main-content">
+                <div class="card-container">
+                    <h2 style="color: var(--secondary); font-size: 20px;">Détails de ma Carte Bancaire</h2>
+                    <p style="font-size:13px; color: var(--text-muted); margin-bottom: 20px;">Informations de la carte associée au compte **<span id="card-client-code-end">...</span>**.</p>
+                    
+                    <!-- DESSIN CARTE BANCAIRE -->
+                    <div class="card-display">
+                        <div class="card-top">
+                            <div style="font-weight: 800; font-size: 13px; letter-spacing: 1px;">CREDIT AGRICOLE</div> 
+                        </div>
+
+                        <div class="card-number" id="card-number-display">
+                            XXXX XXXX XXXX XXXX
+                        </div>
+                        
+                        <div class="card-bottom">
+                            <div class="card-holder">
+                                <span class="card-holder-name" id="card-holder-display">TITULAIRE</span>
+                            </div>
+                            <div class="card-expiry-group">
+                                <div class="card-expiry">
+                                    <span style="font-size:10px; opacity: 0.8;">Exp :</span> <span id="card-expiry-display">MM/AA</span>
+                                </div>
+                                <div class="card-type-logo" id="card-type-display">MASTERCARD</div> 
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INFOS DÉTAILLÉES -->
+                    <div class="section" style="margin-top: 25px;">
+                        <h4 style="margin-bottom: 12px; color: var(--secondary); border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">Informations Complémentaires</h4>
+                        <div class="info-group">
+                            <p><strong>Agence de rattachement :</strong> <span id="card-agency">...</span></p>
+                            <p><strong>Plafond actuel :</strong> <span id="card-limit-spend">2.500,00 € / 7 jours</span></p>
+                            <p><strong>Plafond Retrait :</strong> <span id="card-limit-withdraw">100,00 € / 7 jours</span></p>
+                            <p><strong>Opposition :</strong> <span style="color:#dc3545; font-weight: 600;">En cas de perte, appelez votre gestionnaire.</span></p>
+                        </div>
+
+                        <div class="form-actions" style="margin-top: 20px;">
+                            <button class="btn">Nouveau code PIN</button>
+                            <button class="btn btn-secondary">Faire Opposition</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <!-- WIDGET LATÉRAL -->
+            <aside class="right-sidebar">
+                <div class="widget">
+                    <h4 style="color:var(--secondary); margin-bottom: 8px;">Mon Conseiller</h4>
+                    <p style="font-weight:800; font-size: 14px;" id="advisor-name-widget">Chargement...</p>
+                    <p style="font-size:12px; color:#666; margin-top:6px" id="advisor-contact">Contactez-le pour toutes questions.</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!-- BARRE ANDROID BAS DE PAGE -->
+<footer class="mobile-footer-nav">
+    <div class="mobile-footer-tabs">
+        <a href="dashboard.html" class="mobile-tab">
+            <span>📊</span> COMPTES
+        </a>
+        <a href="cartes.html" class="mobile-tab active">
+            <span>💳</span> CARTES
+        </a>
+        <a href="profil.html" class="mobile-tab">
+            <span>👤</span> PROFIL
+        </a>
+        <a href="rib.html" class="mobile-tab">
+            <span>📄</span> RIB
+        </a>
+    </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="data.js"></script>
+<script src="shared.js"></script>
+
+<script>
+    // -----------------------------------------------------------------
+    // GESTION TACTILE DU MENU SLIDE (ANDROID)
+    // -----------------------------------------------------------------
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    if (menuToggleBtn) menuToggleBtn.addEventListener('click', openSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+
+    // -----------------------------------------------------------------
+    // CHARGEMENT ET DONNÉES
+    // -----------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+        const currentUser = typeof checkAuth === 'function' ? checkAuth() : null; 
+        if (!currentUser) return;
+
+        const cardDisplay = document.querySelector('.card-display');
+        const cardTypeRaw = currentUser.cardType || 'mastercard';
+        const cardLabel = currentUser.cardLabel || 'XXXX XXXX XXXX XXXX';
+        const cardExpiry = currentUser.cardExpiry || 'MM/AA';
+        const cardHolder = currentUser.fullName || 'NOM DU TITULAIRE'; 
+        const cardAgency = currentUser.cardAgency || 'Agence non spécifiée';
+        const clientCode = currentUser.demoClientId || '....';
+        
+        const cardTypeLower = cardTypeRaw.toLowerCase();
+        const cardTypeDisplay = document.getElementById('card-type-display');
+        
+        cardDisplay.classList.remove('mastercard', 'visa');
+
+        if (cardTypeLower.includes('mastercard')) {
+            cardDisplay.classList.add('mastercard');
+            cardTypeDisplay.textContent = 'MASTERCARD';
+        } else {
+            cardTypeDisplay.textContent = 'VISA';
+        }
+        
+        const fullNumber = cardLabel.replace(/[^0-9]/g, ''); 
+        const cardNumberDisplay = document.getElementById('card-number-display');
+
+        if (fullNumber.length === 16) {
+            cardNumberDisplay.textContent = `${fullNumber.substring(0, 4)} ${fullNumber.substring(4, 8)} ${fullNumber.substring(8, 12)} ${fullNumber.substring(12, 16)}`;
+        } else {
+            cardNumberDisplay.textContent = cardLabel;
+        }
+
+        document.getElementById('card-holder-display').textContent = cardHolder;
+        document.getElementById('card-expiry-display').textContent = cardExpiry; 
+        document.getElementById('card-client-code-end').textContent = clientCode.slice(-4);
+        document.getElementById('card-agency').textContent = cardAgency;                
+
+        document.getElementById('advisor-name-widget').textContent = currentUser.advisorName || 'N/A';
+        document.getElementById('advisor-contact').innerHTML = `Tél: ${currentUser.phone || 'N/A'}<br>Email: ${currentUser.advisorEmail || 'N/A'}`;
+    });
+</script>
+</body>
+</html>

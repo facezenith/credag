@@ -1,0 +1,586 @@
+web_code_canvas:generate_web_app{language: 'HTML', query: '<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Espace client - Mon Profil</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand: #ff6600;
+            --secondary: #003366;
+            --secondary-dark: #002244;
+            --text-dark: #1f2933;
+            --bg-light: #f4f6f9;
+            --border-color: #e0e4f0;
+            --text-muted: #6c757d;
+            --sidebar-width: 250px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 70px; /* Espace pour la navigation mobile Android */
+        }
+
+        /* --- LAYOUT GLOBAL --- */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* --- MENU SLIDE COULISSANT (SIDEBAR) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--secondary);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.15);
+        }
+
+        .logo-section {
+            padding: 20px 15px;
+            text-align: center;
+            background: var(--secondary-dark);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .logo-section img {
+            height: 35px;
+            background: #fff;
+            padding: 4px;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        .logo-section p {
+            font-size: 11px;
+            color: #ccc;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .close-sidebar-btn {
+            display: none;
+            position: absolute;
+            top: 15px; right: 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 15px 0;
+            overflow-y: auto;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #d1dce5;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+        .nav-link.active {
+            background: rgba(255, 102, 0, 0.15);
+            color: #fff;
+            border-left-color: var(--brand);
+        }
+
+        .highlight { background: #ffc107; color: var(--text-dark); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .new-badge { font-size: 9px; margin-left: 5px; background: #dc3545; color: #fff; padding: 2px 5px; border-radius: 3px; font-weight: 800; }
+
+        /* Overlay sombre Android */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- MAIN WRAPPER --- */
+        .main-wrapper {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* --- HEADER TOP --- */
+        .header {
+            background: #fff;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+
+        .menu-toggle-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: var(--secondary);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .tabs { display: flex; gap: 15px; }
+        .tab {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            color: var(--secondary);
+            border-bottom-color: var(--brand);
+        }
+
+        .search input {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 220px;
+            font-size: 13px;
+            outline: none;
+            background: var(--bg-light);
+        }
+
+        .icons { font-size: 18px; display: flex; gap: 12px; cursor: pointer; }
+        .icons a { text-decoration: none; color: inherit; }
+
+        /* --- CONTENT AREA --- */
+        .content-area {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+            padding: 25px;
+            flex: 1;
+        }
+
+        /* CARD PROFIL */
+        .profile-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            max-width: 750px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .profile-card h3 {
+            color: var(--secondary);
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--brand);
+        }
+
+        .section-title {
+            margin: 20px 0 12px;
+            font-size: 16px;
+            color: var(--brand);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-group {
+            background: #fafbfc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 5px 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .info-row:last-child { border-bottom: none; }
+
+        .info-label {
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 14px;
+            min-width: 140px;
+        }
+
+        .info-value {
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .btn {
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+
+        .btn:hover { background: #e05c00; }
+
+        /* WIDGETS SIDEBAR DROITE */
+        .right-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+        .widget {
+            background: #fff;
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .widget h4 { color: var(--secondary); margin-bottom: 10px; font-size: 15px; font-weight: 800; }
+        .dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; background: var(--brand); }
+
+        /* --- BARRE DE NAVIGATION ANDROID (BAS DE PAGE) --- */
+        .mobile-footer-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+            padding: 8px 0;
+            z-index: 900;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+        }
+
+        .mobile-footer-tabs { display: flex; justify-content: space-around; align-items: center; }
+
+        .mobile-tab {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .mobile-tab.active { color: var(--brand); }
+
+        /* --- MEDIA QUERIES RESPONSIVE --- */
+        @media (max-width: 1024px) {
+            .content-area { grid-template-columns: 1fr; }
+            .right-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding-bottom: 70px; }
+            .sidebar { transform: translateX(-100%); width: 270px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; opacity: 1; }
+            .close-sidebar-btn { display: block; }
+            
+            .main-wrapper { margin-left: 0; }
+            .menu-toggle-btn { display: block; }
+            
+            .header { padding: 0 15px; }
+            .tabs { display: none; } /* Masqué sur mobile pour épurage */
+            .search input { width: 130px; }
+            
+            .content-area { padding: 15px; }
+            
+            .right-sidebar { grid-template-columns: 1fr; }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .info-value { text-align: left; }
+
+            .mobile-footer-nav { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- Overlay sombre tactile Android -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MENU SLIDE COULISSANT (DRAWER) -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-section">
+            <button class="close-sidebar-btn" id="closeSidebarBtn">✕</button>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM7lGTyAI0yZzf5VJ51yertxgJvZH7m7XmQ&s" alt="Logo">
+            <p>Espace client</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link"><span>📊</span> &nbsp; Comptes & Cartes</a>
+            <a href="credits.html" class="nav-link"><span>🏦</span> &nbsp; Crédits</a>
+            <a href="cartes.html" class="nav-link"><span>💳</span> &nbsp; Cartes</a>
+            <a href="profil.html" class="nav-link active"><span>👤</span> &nbsp; Profil</a>
+            <a href="#" class="nav-link"><span class="highlight">Rentabilis 3%</span> <span class="new-badge">NEW</span></a>
+            <a href="virement.html" class="nav-link" style="margin-top: 10px;"><span>💸</span> &nbsp; Virement</a>
+            <a href="ajouter-beneficiaire.html" class="nav-link"><span>➕</span> &nbsp; Ajouter Bénéficiaire</a>
+            <a href="historique.html" class="nav-link"><span>📜</span> &nbsp; Historique</a>
+            <a href="en-ligne.html" class="nav-link"><span>💬</span> &nbsp; Contacter en ligne</a>
+            <a href="#" class="nav-link" id="logoutLink" style="color: #ff8888; margin-top: 15px;"><span>🚪</span> &nbsp; Déconnexion</a>
+        </nav>
+    </aside>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <div class="main-wrapper">
+
+        <!-- HEADER TOPBAR -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle-btn" id="menuToggleBtn">☰</button>
+                <div class="tabs">
+                    <a href="dashboard.html" class="tab">MES COMPTES</a>
+                    <a href="cartes.html" class="tab">MES CARTES</a>
+                    <a href="profil.html" class="tab active">MON PROFIL</a>
+                    <a href="rib.html" class="tab">MON RIB</a>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <div class="search" role="search">
+                    <input placeholder="Recherche..." />
+                </div>
+                <div class="icons">
+                    <span title="phone">📞</span>
+                    <span title="mail"><a href="en-ligne.html">✉️</a></span>
+                    <span title="deconnexion"><a href="deconnexion.html">🔒</a></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ZONE DE CONTENU -->
+        <div class="content-area">
+            <main class="main-content">
+                <div class="profile-card">
+                    <h3>Mon Profil & Infos Personnelles</h3>
+
+                    <div class="section-title">
+                        <span>👤</span> Informations Personnelles
+                    </div>
+                    <div class="info-group">
+                        <div class="info-row">
+                            <span class="info-label">Nom et Prénom :</span>
+                            <span class="info-value" id="profil-nom">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Date de Naissance :</span>
+                            <span class="info-value" id="profil-dob">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Adresse :</span>
+                            <span class="info-value" id="profil-address">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Téléphone :</span>
+                            <span class="info-value" id="profil-phone">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email :</span>
+                            <span class="info-value" id="profil-email">Chargement...</span>
+                        </div>
+                    </div>
+
+                    <div class="section-title">
+                        <span>🏦</span> Informations Bancaires
+                    </div>
+                    <div class="info-group">
+                        <div class="info-row">
+                            <span class="info-label">Code Client :</span>
+                            <span class="info-value" id="profil-code-client">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">IBAN Principal :</span>
+                            <span class="info-value" id="profil-iban" style="font-family: monospace; letter-spacing: 0.5px;">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Nom de la Banque :</span>
+                            <span class="info-value" id="profil-bank">Chargement...</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Nom Conseiller :</span>
+                            <span class="info-value" id="profil-advisor-name">Chargement...</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <button class="btn" onclick="alert('Pour modifier vos données, veuillez contacter votre conseiller.')">Modifier mes informations</button>
+                    </div>
+                </div>
+            </main>
+
+            <!-- SIDEBAR DROITE -->
+            <aside class="right-sidebar">
+                <div class="widget">
+                    <h4>Mon Conseiller</h4>
+                    <p style="font-weight:800; color: var(--secondary);" id="advisor-name-widget-right">Chargement...</p>
+                    <p style="font-size:13px; color:#666; margin-top:6px;" id="advisor-contact-right">Contactez-le pour toute assistance.</p>
+                </div>
+
+                <div class="widget">
+                    <h4>Activité du Compte</h4>
+                    <div style="font-size:13px; color:#666; margin-bottom: 5px;">Dernière connexion</div>
+                    <div style="font-weight: 700; font-size: 14px;"><span class="dot"></span><span id="last-connection-right">...</span></div>
+                </div>
+
+                <img src="https://upload.wikimedia.org/wikipedia/fr/d/d3/Logo-CADIF-carre.svg" alt="GTBank Service" style="width:100%; border-radius:10px; border:1px solid var(--border-color); max-height:220px; object-fit:contain; background:#fff; padding:10px;">
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!-- BARRE NAVIGATION ANDROID (BAS DE PAGE) -->
+<footer class="mobile-footer-nav">
+    <div class="mobile-footer-tabs">
+        <a href="dashboard.html" class="mobile-tab">
+            <span>📊</span> COMPTES
+        </a>
+        <a href="cartes.html" class="mobile-tab">
+            <span>💳</span> CARTES
+        </a>
+        <a href="virement.html" class="mobile-tab">
+            <span>💸</span> VIREMENT
+        </a>
+        <a href="profil.html" class="mobile-tab active">
+            <span>👤</span> PROFIL
+        </a>
+    </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="data.js"></script>
+<script src="shared.js"></script>
+
+<script>
+    // --- GESTION DU MENU SLIDE (TACTILE ANDROID) ---
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    if (menuToggleBtn) menuToggleBtn.addEventListener('click', openSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+    // Gestes Tactiles Swipe pour ouvrir/fermer le menu
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, false);
+
+    function handleSwipe() {
+        if (touchEndX - touchStartX > 80 && touchStartX < 40) openSidebar();
+        if (touchStartX - touchEndX > 80 && sidebar.classList.contains('open')) closeSidebar();
+    }
+
+    // --- CHARGEMENT DES DONNÉES DU PROFIL ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const currentUser = typeof checkAuth === 'function' ? checkAuth() : null;
+        if (!currentUser) return;
+
+        // Informations Personnelles
+        document.getElementById('profil-nom').textContent = currentUser.fullName || 'Non spécifié';
+        document.getElementById('profil-dob').textContent = currentUser.birthDate || 'Non spécifié';
+        document.getElementById('profil-address').textContent = currentUser.address || 'Non spécifié';
+        document.getElementById('profil-phone').textContent = currentUser.phone || 'Non spécifié';
+        document.getElementById('profil-email').textContent = currentUser.email || 'Non spécifié';
+
+        // Informations Bancaires
+        document.getElementById('profil-code-client').textContent = currentUser.demoClientId || currentUser.docId || 'Non spécifié';
+        
+        const rawIban = currentUser.ibanDemo || currentUser.iban || 'Non spécifié'; 
+        document.getElementById('profil-iban').textContent = rawIban.replace(/\s/g, '').replace(/(\S{4})(?=\S)/g, '$1 ').trim(); 
+        
+        document.getElementById('profil-bank').textContent = currentUser.bankName || 'GT Bank / GTCO';
+        document.getElementById('profil-advisor-name').textContent = currentUser.advisorName || 'Conseiller Attitré';
+        
+        // Widgets
+        const advisorName = currentUser.advisorName || 'Conseiller GTCO';
+        const advisorPhone = currentUser.advisorPhone || currentUser.phone || 'Non spécifié';
+        const advisorEmail = currentUser.advisorEmail || 'Non spécifié';
+        
+        document.getElementById('advisor-name-widget-right').textContent = advisorName;
+        document.getElementById('advisor-contact-right').innerHTML = `Tél: ${advisorPhone}<br>Email:${advisorEmail}`;
+        
+        document.getElementById('last-connection-right').textContent = currentUser.lastConnection || 'Aujourd\'hui';
+    });
+</script>
+
+</body>
+</html>`}
