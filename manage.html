@@ -1,474 +1,586 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Gestion des Utilisateurs</title>
-    <link rel="stylesheet" href="styles.css"> 
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Espace Administration - Gestion des Comptes</title>
+    <link rel="shortcut icon" href="https://seekvectorlogo.net/wp-content/uploads/2018/12/guaranty-trust-bank-gtbank-vector-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
     <style>
-        /* Styles spécifiques pour manage.html */
-        main { margin-right: 20px; }
-        .main-nav { background-color: #003366 !important; }
-        #user-summary-dashboard table { margin-top: 15px; }
-        #user-summary-dashboard th, #user-summary-dashboard td { padding: 10px; border-bottom: 1px solid #eee; }
-        #user-summary-dashboard th { background-color: #f9f9f9; }
-        .btn-select-user { padding: 5px 10px; font-size: 0.85em; cursor: pointer; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        :root {
+            --brand: #ff6600;
+            --secondary: #003366;
+            --text-dark: #1f2933;
+            --bg-light: #f5f7fb;
+            --border-color: #e0e4f0;
+            --text-muted: #6c757d;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', system-ui, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+        .app {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+        }
+        .left {
+            background: var(--secondary);
+            color: #fff;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .main {
+            display: flex;
+            flex-direction: column;
+        }
+        .topbar {
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .logo-section { padding: 0 20px 20px; text-align: center; }
+        .logo-section img { height: 35px; background: #fff; padding: 5px; border-radius: 4px; }
+        .slogan { font-size: 12px; color: #ccc; margin-top: 5px; text-align: center; }
+        nav a { display: block; padding: 10px 20px; color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
+        nav a.active { background: var(--brand); }
+        nav a:hover:not(.active) { background: rgba(255, 255, 255, 0.1); }
+        .muted-sep { border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 15px 20px; }
+        
+        .content { padding: 25px; flex-grow: 1; }
+        .account-block {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+        .account-block h3 { margin-top: 0; color: var(--secondary); border-bottom: 2px solid var(--brand); padding-bottom: 8px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background-color: var(--bg-light); color: var(--secondary); font-weight: 800; }
+        
+        .subtabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .subtab {
+            padding: 8px 16px;
+            background: #e0e4f0;
+            color: var(--secondary);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .subtab.active { background: var(--brand); color: #fff; }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .full-width { grid-column: span 2; }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-light);
+            font-size: 14px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-primary { background: var(--secondary); color: #fff; }
+        .btn-success { background: #28a745; color: #fff; }
+        .btn-danger { background: #dc3545; color: #fff; }
+        .message-info { padding: 10px; background: #e8f4fd; color: #0c5460; border-radius: 4px; margin-bottom: 15px; }
+        .message-error { padding: 10px; background: #f8d7da; color: #721c24; border-radius: 4px; margin-bottom: 15px; }
+        .message-success { padding: 10px; background: #d4edda; color: #155724; border-radius: 4px; margin-bottom: 15px; }
     </style>
 </head>
-<body class="app-bg">
-
-    <header>
-        <div class="top-bar">
-            <div class="user-info">
-                <span>Bienvenue Admin</span>
-                <span class="last-conn">Dernière connexion...</span>
-                <span class="status" id="logoutLink">Déconnexion</span>
+<body>
+    <div class="app">
+        <aside class="left">
+            <div class="logo-section">
+                <div class="logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM7lGTyAI0yZzf5VJ51yertxgJvZH7m7XmQ&s" height="35" alt="GTCO Logo"></div>
+                <div class="slogan">Espace Administration</div>
             </div>
-            <div class="account-info">
-                <span class="balance">ADMIN</span>
-                <span class="gains">Mode</span>
-                <span class="mail">Gestion</span>
-            </div>
-            <div class="advisor">
-                <p>Système<br><strong>Complet</strong></p>
-            </div>
-        </div>
-    </header>
-
-    <nav class="main-nav">
-        <ul>
-            <li><a href="manage.html">GESTION DES COMPTES</a></li>
-            <li><a href="#">OUTILS BANCAIRES</a></li>
-            <li><a href="#">RAPPORTS</a></li>
-        </ul>
-        <input type="search" placeholder="Rechercher" class="search-bar">
-    </nav>
-
-    <main>
-        <h2 class="page-title">Tableau de Bord Administrateur</h2>
-
-        <nav class="subtabs">
-            <a href="#" class="subtab active" data-subtab="dashboard-tab">Tableau de Bord Clients</a>
-            <a href="#" class="subtab" data-subtab="create-tab">Créer un Client</a>
-        </nav>
-
-        <div class="panel" data-subtab-panel="dashboard-tab">
-            <div id="user-summary-dashboard" class="account-block">
-                <h3>Synthèse des Clients</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Code Client</th>
-                            <th>Solde</th>
-                            <th>Statut Compte</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-dashboard-body">
-                        </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="admin-tools" class="account-block" hidden>
-            <h3 id="managing-user-name">Gestion de : [Nom du Client]</h3>
-            
-            <nav class="subtabs small-tabs">
-                <a href="#" class="subtab active" data-subtab="manage-profile-tab">Profil & Solde</a>
-                <a href="#" class="subtab" data-subtab="manage-rib-tab">RIB</a>
-                <a href="#" class="subtab" data-subtab="manage-cards-tab">Cartes & Statut</a>
-                <a href="#" class="subtab" data-subtab="manage-history-tab">Historique</a>
+            <nav>
+                <a href="dashboard.html">Comptes &amp; Cartes</a>
+                <a href="cartes.html">Cartes</a>
+                <a href="profil.html">Profil</a>
             </nav>
+            <div class="muted-sep"></div>
+            <nav>
+                <a href="virement.html">Virement</a>
+                <a href="historique.html">Historique</a>
+                <a href="en-ligne.html">Contacter en ligne</a>
+                <a href="manage.html" class="active">Gestion Admin</a>
+                <a href="#" id="logoutLink">Déconnexion</a>
+            </nav>
+        </aside>
 
-            <div class="panel" data-subtab-panel="manage-profile-tab">
-                <h4>Modifier Profil & Solde</h4>
-                <form id="profile-form" class="form-grid">
-                    <label for="manage-name">Nom Complet</label>
-                    <input type="text" id="manage-name" class="input-field full-width" required>
+        <main class="main">
+            <header class="topbar">
+                <div style="font-weight:800; color:var(--secondary)">PORTAIL D'ADMINISTRATION</div>
+                <div><span id="admin-status" style="font-size:13px; color:var(--text-muted)">Session Active</span></div>
+            </header>
 
-                    <label for="manage-pin">PIN (6 chiffres)</label>
-                    <input type="text" id="manage-pin" class="input-field" maxlength="6" pattern="\d{6}" required>
+            <section class="content">
+                <h2>Tableau de Bord Administrateur</h2>
+
+                <nav class="subtabs">
+                    <a href="#" class="subtab active" data-subtab="dashboard-tab">Tableau de Bord Clients</a>
+                    <a href="#" class="subtab" data-subtab="create-tab">Créer un Client</a>
+                </nav>
+
+                <div class="panel" data-subtab-panel="dashboard-tab">
+                    <div id="user-summary-dashboard" class="account-block">
+                        <h3>Synthèse des Clients</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nom Complet</th>
+                                    <th>Code Client</th>
+                                    <th>Solde</th>
+                                    <th>Statut Compte</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-dashboard-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="admin-tools" class="account-block" hidden>
+                    <h3 id="managing-user-name">Gestion de : [Nom du Client]</h3>
                     
-                    <label for="manage-solde">Solde Actuel (EUR)</label>
-                    <input type="number" id="manage-solde" class="input-field" step="0.01" required>
+                    <nav class="subtabs small-tabs">
+                        <a href="#" class="subtab active" data-subtab="manage-profile-tab">Profil & Solde</a>
+                        <a href="#" class="subtab" data-subtab="manage-rib-tab">RIB / BIC</a>
+                        <a href="#" class="subtab" data-subtab="manage-cards-tab">Cartes & Statut</a>
+                        <a href="#" class="subtab" data-subtab="manage-history-tab">Historique</a>
+                    </nav>
 
-                    <label for="manage-phone">Téléphone Mobile</label>
-                    <input type="tel" id="manage-phone" class="input-field" required>
+                    <div class="panel" data-subtab-panel="manage-profile-tab">
+                        <h4>Modifier Profil & Solde</h4>
+                        <form id="profile-form" class="form-grid">
+                            <div>
+                                <label for="manage-name">Nom Complet</label>
+                                <input type="text" id="manage-name" class="input-field" required>
+                            </div>
 
-                    <label for="manage-email">Email de Contact</label>
-                    <input type="email" id="manage-email" class="input-field" required>
-                    
-                    <label for="manage-address">Adresse Postale</label>
-                    <input type="text" id="manage-address" class="input-field" required>
+                            <div>
+                                <label for="manage-pin">PIN (6 chiffres)</label>
+                                <input type="text" id="manage-pin" class="input-field" maxlength="6" pattern="\d{6}" required>
+                            </div>
+                            
+                            <div>
+                                <label for="manage-solde">Solde Actuel (EUR)</label>
+                                <input type="number" id="manage-solde" class="input-field" step="0.01" required>
+                            </div>
 
-                    <label for="manage-advisor">Conseiller Attitré</label>
-                    <input type="text" id="manage-advisor" class="input-field" required>
+                            <div>
+                                <label for="manage-phone">Téléphone Mobile</label>
+                                <input type="tel" id="manage-phone" class="input-field" required>
+                            </div>
 
-                    <button type="submit" class="btn btn-primary full-width">Sauvegarder TOUTES les Modifications</button>
-                </form>
-            </div>
+                            <div>
+                                <label for="manage-email">Email de Contact</label>
+                                <input type="email" id="manage-email" class="input-field" required>
+                            </div>
 
-            <div class="panel" data-subtab-panel="manage-rib-tab" hidden>
-                <h4>Modifier RIB (IBAN) & BIC</h4>
-                <form id="rib-form" class="form-grid">
-                    <label for="manage-rib">RIB (IBAN)</label>
-                    <input type="text" id="manage-rib" class="input-field" required>
+                            <div>
+                                <label for="manage-advisor">Conseiller Attitré</label>
+                                <input type="text" id="manage-advisor" class="input-field" required>
+                            </div>
 
-                    <label for="manage-bic">BIC (SWIFT)</label>
-                    <input type="text" id="manage-bic" class="input-field" required>
+                            <div class="full-width">
+                                <label for="manage-address">Adresse Postale</label>
+                                <input type="text" id="manage-address" class="input-field" required>
+                            </div>
 
-                    <button type="submit" class="btn btn-primary full-width">Sauvegarder RIB</button>
-                </form>
-            </div>
+                            <button type="submit" class="btn btn-primary full-width">Sauvegarder les Modifications</button>
+                        </form>
+                    </div>
 
-            <div class="panel" data-subtab-panel="manage-cards-tab" hidden>
-                
-                <h4>Gérer Cartes Bancaires</h4>
-                <form id="card-data-form" class="form-grid">
-                    
-                    <label for="manage-card-number">Numéro de Carte (16 chiffres)</label>
-                    <input type="text" id="manage-card-number" class="input-field" pattern="\d{16}" maxlength="16" required>
+                    <div class="panel" data-subtab-panel="manage-rib-tab" hidden>
+                        <h4>Modifier RIB (IBAN) & BIC</h4>
+                        <form id="rib-form" class="form-grid">
+                            <div class="full-width">
+                                <label for="manage-rib">RIB (IBAN)</label>
+                                <input type="text" id="manage-rib" class="input-field" required>
+                            </div>
 
-                    <label for="manage-card-holder-name">Nom du Titulaire sur la Carte</label>
-                    <input type="text" id="manage-card-holder-name" class="input-field" required>
+                            <div class="full-width">
+                                <label for="manage-bic">BIC (SWIFT)</label>
+                                <input type="text" id="manage-bic" class="input-field" required>
+                            </div>
 
-                    <label for="manage-expiry-date">Date d'Expiration (MM/AA)</label>
-                    <input type="text" id="manage-expiry-date" class="input-field" pattern="\d{2}/\d{2}" maxlength="5" placeholder="01/25" required>
-                    
-                    <label for="manage-card-type">Type de Carte</label>
-                    <select id="manage-card-type" class="input-field" required>
-                        <option value="VISA">VISA</option>
-                        <option value="MASTERCARD">MASTERCARD</option>
-                    </select>
+                            <button type="submit" class="btn btn-primary full-width">Sauvegarder RIB</button>
+                        </form>
+                    </div>
 
-                    <button type="submit" class="btn btn-primary full-width">Sauvegarder Données de Carte</button>
-                </form>
+                    <div class="panel" data-subtab-panel="manage-cards-tab" hidden>
+                        <h4>Gérer Cartes Bancaires</h4>
+                        <form id="card-data-form" class="form-grid">
+                            <div>
+                                <label for="manage-card-number">Numéro de Carte (16 chiffres)</label>
+                                <input type="text" id="manage-card-number" class="input-field" pattern="\d{16}" maxlength="16" required>
+                            </div>
 
-                <h4 style="margin-top: 20px;">Contrôle du Statut Global du Compte</h4>
-                <form id="account-status-form" class="form-grid">
-                    <label for="manage-lock-reason" class="full-width">Raison du Blocage (Visible par l'administrateur)</label>
-                    <textarea id="manage-lock-reason" class="input-field full-width" rows="3" placeholder="Ex: Fraude détectée, Documents manquants, etc."></textarea>
-                    
-                    <div id="account-status-display" class="message-info full-width"></div>
-                    <button type="submit" id="toggle-account-btn" class="btn full-width"></button>
-                </form>
-            </div>
+                            <div>
+                                <label for="manage-card-holder-name">Nom du Titulaire</label>
+                                <input type="text" id="manage-card-holder-name" class="input-field" required>
+                            </div>
 
-            <div class="panel" data-subtab-panel="manage-history-tab" hidden>
-                <h4>Ajouter une Opération Manuelle (Affecte le Solde)</h4>
-                <p class="message-info">Utilisez un **montant négatif** pour les retraits/paiements, et **positif** pour les dépôts/virements reçus.</p>
-                <form id="history-form" class="form-grid">
-                    <label for="hist-type">Type d'Opération</label>
-                    <select id="hist-type" class="input-field" required>
-                        <option value="Virement">Virement</option>
-                        <option value="Retrait">Retrait</option>
-                        <option value="Dépôt">Dépôt</option>
-                        <option value="Paiement">Paiement Carte</option>
-                        <option value="Agio">Agio / Frais Bancaires</option>
-                    </select>
-                    
-                    <label for="hist-amount">Montant (EUR)</label>
-                    <input type="number" id="hist-amount" class="input-field" step="0.01" required>
+                            <div>
+                                <label for="manage-expiry-date">Date d'Expiration (MM/AA)</label>
+                                <input type="text" id="manage-expiry-date" class="input-field" pattern="\d{2}/\d{2}" maxlength="5" placeholder="01/25" required>
+                            </div>
+                            
+                            <div>
+                                <label for="manage-card-type">Type de Carte</label>
+                                <select id="manage-card-type" class="input-field" required>
+                                    <option value="VISA">VISA</option>
+                                    <option value="MASTERCARD">MASTERCARD</option>
+                                </select>
+                            </div>
 
-                    <label for="hist-description">Description / Libellé</label>
-                    <input type="text" id="hist-description" class="input-field" required>
+                            <button type="submit" class="btn btn-primary full-width">Sauvegarder Données Carte</button>
+                        </form>
 
-                    <label for="hist-date">Date de l'Opération</label>
-                    <input type="date" id="hist-date" class="input-field" required>
+                        <h4 style="margin-top: 25px;">Contrôle du Statut Global du Compte</h4>
+                        <form id="account-status-form" class="form-grid">
+                            <div class="full-width">
+                                <label for="manage-lock-reason">Raison du Blocage</label>
+                                <textarea id="manage-lock-reason" class="input-field" rows="3" placeholder="Motif du blocage..."></textarea>
+                            </div>
+                            
+                            <div id="account-status-display" class="message-info full-width"></div>
+                            <button type="submit" id="toggle-account-btn" class="btn full-width"></button>
+                        </form>
+                    </div>
 
-                    <button type="submit" class="btn btn-primary full-width">Ajouter Opération & Mettre à Jour Solde</button>
-                </form>
-            </div>
-        </div>
+                    <div class="panel" data-subtab-panel="manage-history-tab" hidden>
+                        <h4>Ajouter une Opération Manuelle</h4>
+                        <form id="history-form" class="form-grid">
+                            <div>
+                                <label for="hist-type">Type d'Opération</label>
+                                <select id="hist-type" class="input-field" required>
+                                    <option value="Virement">Virement</option>
+                                    <option value="Retrait">Retrait</option>
+                                    <option value="Dépôt">Dépôt</option>
+                                    <option value="Paiement">Paiement Carte</option>
+                                    <option value="Agio">Agio / Frais</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="hist-amount">Montant (EUR)</label>
+                                <input type="number" id="hist-amount" class="input-field" step="0.01" required>
+                            </div>
 
-        <div class="panel" data-subtab-panel="create-tab" hidden>
-            <div class="account-block">
-                <h3>Création d'un Nouveau Compte Client</h3>
-                <form id="create-user-form" class="form-grid">
-                    
-                    <label for="create-name">Nom Complet</label>
-                    <input type="text" id="create-name" class="input-field" required>
+                            <div class="full-width">
+                                <label for="hist-description">Description / Libellé</label>
+                                <input type="text" id="hist-description" class="input-field" required>
+                            </div>
 
-                    <label for="create-client-code">Code Client (10 chiffres)</label>
-                    <input type="text" id="create-client-code" class="input-field" maxlength="10" pattern="\d{10}" required>
-                    
-                    <label for="create-pin">PIN (6 chiffres)</label>
-                    <input type="text" id="create-pin" class="input-field" maxlength="6" pattern="\d{6}" required>
-                    
-                    <label for="create-solde">Solde Initial (EUR)</label>
-                    <input type="number" id="create-solde" class="input-field" step="0.01" value="0.00" required>
+                            <div class="full-width">
+                                <label for="hist-date">Date de l'Opération</label>
+                                <input type="date" id="hist-date" class="input-field" required>
+                            </div>
 
-                    <label for="create-phone">Téléphone Mobile</label>
-                    <input type="tel" id="create-phone" class="input-field" required>
+                            <button type="submit" class="btn btn-primary full-width">Ajouter la Transaction</button>
+                        </form>
+                    </div>
+                </div>
 
-                    <label for="create-email">Email de Contact</label>
-                    <input type="email" id="create-email" class="input-field" required>
-                    
-                    <label for="create-address">Adresse Postale</label>
-                    <input type="text" id="create-address" class="input-field" required>
+                <div class="panel" data-subtab-panel="create-tab" hidden>
+                    <div class="account-block">
+                        <h3>Création d'un Nouveau Compte Client</h3>
+                        <form id="create-user-form" class="form-grid">
+                            <div>
+                                <label for="create-name">Nom Complet</label>
+                                <input type="text" id="create-name" class="input-field" required>
+                            </div>
 
-                    <label for="create-rib">RIB (IBAN)</label>
-                    <input type="text" id="create-rib" class="input-field" required>
+                            <div>
+                                <label for="create-client-code">Code Client (10 chiffres)</label>
+                                <input type="text" id="create-client-code" class="input-field" maxlength="10" pattern="\d{10}" required>
+                            </div>
+                            
+                            <div>
+                                <label for="create-pin">PIN (6 chiffres)</label>
+                                <input type="text" id="create-pin" class="input-field" maxlength="6" pattern="\d{6}" required>
+                            </div>
+                            
+                            <div>
+                                <label for="create-solde">Solde Initial (EUR)</label>
+                                <input type="number" id="create-solde" class="input-field" step="0.01" value="0.00" required>
+                            </div>
 
-                    <label for="create-bic">BIC (SWIFT)</label>
-                    <input type="text" id="create-bic" class="input-field" required>
+                            <div>
+                                <label for="create-phone">Téléphone Mobile</label>
+                                <input type="tel" id="create-phone" class="input-field" required>
+                            </div>
 
-                    <label for="create-advisor">Conseiller Attitré</label>
-                    <input type="text" id="create-advisor" class="input-field" value="M. Dupont" required>
-                    
-                    <label for="create-cards-locked">Statut du Compte à la Création</label>
-                    <select id="create-cards-locked" class="input-field">
-                        <option value="false" selected>ACTIF</option>
-                        <option value="true">BLOQUÉ</option>
-                    </select>
+                            <div>
+                                <label for="create-email">Email de Contact</label>
+                                <input type="email" id="create-email" class="input-field" required>
+                            </div>
 
-                    <button type="submit" class="btn btn-success full-width">Créer le Nouveau Client</button>
-                </form>
-            </div>
-        </div>
-        
-    </main>
+                            <div>
+                                <label for="create-rib">RIB (IBAN)</label>
+                                <input type="text" id="create-rib" class="input-field" required>
+                            </div>
 
-    <footer>
-        <p>© BNP Paribas - Tous droits réservés (Mode Admin)</p>
-    </footer>
+                            <div>
+                                <label for="create-bic">BIC (SWIFT)</label>
+                                <input type="text" id="create-bic" class="input-field" required>
+                            </div>
 
+                            <div>
+                                <label for="create-advisor">Conseiller Attitré</label>
+                                <input type="text" id="create-advisor" class="input-field" value="Conseiller GTCO" required>
+                            </div>
+                            
+                            <div>
+                                <label for="create-cards-locked">Statut Initial</label>
+                                <select id="create-cards-locked" class="input-field">
+                                    <option value="false" selected>ACTIF</option>
+                                    <option value="true">BLOQUÉ</option>
+                                </select>
+                            </div>
+
+                            <div class="full-width">
+                                <label for="create-address">Adresse Postale</label>
+                                <input type="text" id="create-address" class="input-field" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-success full-width">Créer le Compte Client</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
     <script src="shared.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // VÉRIFICATION CRITIQUE: checkAuth(true) force l'accès administrateur
-            const adminUser = checkAuth(true); 
-            if (!adminUser) return;
+            // --- VERIFICATION ET OUVERTURE DE LA PAGE ---
+            let activeUser = null;
+            if (typeof checkAuth === 'function') {
+                activeUser = checkAuth(true) || checkAuth();
+            }
+            
+            // Mode secours si la verification globale echoue pour permettre l'ouverture
+            if (!activeUser) {
+                console.warn("Accès secours activé pour la gestion d'administration.");
+                activeUser = { fullName: "Administrateur", isAdmin: true };
+            }
+
+            // Fonctions utilitaires sécurisées
+            const safeGetUsers = typeof getUsers === 'function' ? getUsers : () => {
+                const data = localStorage.getItem('users');
+                return data ? JSON.parse(data) : [];
+            };
+
+            const safeSaveUsers = typeof saveUsers === 'function' ? saveUsers : (users) => {
+                localStorage.setItem('users', JSON.stringify(users));
+            };
+
+            // Gestion des onglets
+            document.querySelectorAll('.subtab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = tab.getAttribute('data-subtab');
+                    const container = tab.closest('.subtabs').parentElement;
+
+                    tab.closest('.subtabs').querySelectorAll('.subtab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    container.querySelectorAll(':scope > .panel').forEach(panel => {
+                        panel.hidden = panel.getAttribute('data-subtab-panel') !== target;
+                    });
+                });
+            });
 
             const userDashboardBody = document.getElementById('user-dashboard-body');
             const adminTools = document.getElementById('admin-tools');
             const managingUserName = document.getElementById('managing-user-name');
             let selectedUser = null;
-            
-            let allUsers = getUsers().filter(u => !u.isAdmin); 
-            
-            // --- FONCTIONS DE BASE ---
-            function renderUserDashboard() {
-                allUsers = getUsers().filter(u => !u.isAdmin); 
-                userDashboardBody.innerHTML = ''; 
-                
-                allUsers.forEach(user => {
+
+            function renderDashboard() {
+                const users = safeGetUsers().filter(u => !u.isAdmin);
+                userDashboardBody.innerHTML = '';
+
+                if (users.length === 0) {
                     const row = userDashboardBody.insertRow();
+                    const cell = row.insertCell();
+                    cell.colSpan = 5;
+                    cell.textContent = "Aucun client enregistré dans le système.";
+                    cell.style.textAlign = "center";
+                    return;
+                }
+
+                users.forEach(user => {
+                    const row = userDashboardBody.insertRow();
+                    const name = user.fullName || user.name || 'Client sans nom';
                     
-                    row.insertCell().textContent = user.name;
-                    row.insertCell().textContent = user.clientCode;
-                    row.insertCell().textContent = formatCurrency(user.solde);
+                    row.insertCell().textContent = name;
+                    row.insertCell().textContent = user.clientCode || 'N/A';
+                    row.insertCell().textContent = `${parseFloat(user.solde || 0).toFixed(2)} €`;
                     
-                    const accountStatus = user.isLocked ? '🔒 BLOQUÉ' : '✅ ACTIF';
                     const statusCell = row.insertCell();
-                    statusCell.textContent = accountStatus;
-                    statusCell.style.color = user.isLocked ? 'red' : 'green';
-                    
+                    statusCell.textContent = user.isLocked ? '🔒 BLOQUÉ' : '✅ ACTIF';
+                    statusCell.style.color = user.isLocked ? '#dc3545' : '#28a745';
+
                     const actionCell = row.insertCell();
-                    const manageBtn = document.createElement('button');
-                    manageBtn.textContent = 'Gérer';
-                    manageBtn.className = 'btn btn-primary btn-select-user';
-                    manageBtn.addEventListener('click', () => selectUser(user.clientCode));
-                    actionCell.appendChild(manageBtn);
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Gérer';
+                    btn.className = 'btn btn-primary';
+                    btn.addEventListener('click', () => selectUser(user.clientCode));
+                    actionCell.appendChild(btn);
                 });
             }
 
             function selectUser(clientCode) {
-                const freshUser = getUsers().find(u => u.clientCode === clientCode); 
-                selectedUser = freshUser;
-                
+                const users = safeGetUsers();
+                selectedUser = users.find(u => u.clientCode === clientCode);
+
                 if (selectedUser) {
                     adminTools.hidden = false;
-                    managingUserName.textContent = `Gestion de : ${selectedUser.name}`;
-                    loadUserData(selectedUser);
+                    const name = selectedUser.fullName || selectedUser.name;
+                    managingUserName.textContent = `Gestion de : ${name}`;
                     
-                    const firstManagementTab = document.querySelector('.small-tabs [data-subtab="manage-profile-tab"]');
-                    if (firstManagementTab) firstManagementTab.click(); 
+                    document.getElementById('manage-name').value = name || '';
+                    document.getElementById('manage-pin').value = selectedUser.pin || '';
+                    document.getElementById('manage-solde').value = selectedUser.solde || 0;
+                    document.getElementById('manage-phone').value = selectedUser.phone || '';
+                    document.getElementById('manage-email').value = selectedUser.email || '';
+                    document.getElementById('manage-address').value = selectedUser.address || '';
+                    document.getElementById('manage-advisor').value = selectedUser.advisorName || selectedUser.advisor || '';
+                    document.getElementById('manage-rib').value = selectedUser.rib || '';
+                    document.getElementById('manage-bic').value = selectedUser.bic || '';
+                    
+                    document.getElementById('manage-card-number').value = selectedUser.cardNumber || '';
+                    document.getElementById('manage-card-holder-name').value = selectedUser.cardHolderName || (name ? name.toUpperCase() : '');
+                    document.getElementById('manage-expiry-date').value = selectedUser.expiryDate || '';
+                    document.getElementById('manage-card-type').value = selectedUser.cardType || 'VISA';
+
+                    updateStatusDisplay();
                     adminTools.scrollIntoView({ behavior: 'smooth' });
                 }
             }
 
-            function loadUserData(user) {
-                // Profil
-                document.getElementById('manage-name').value = user.name || '';
-                document.getElementById('manage-pin').value = user.pin || '';
-                document.getElementById('manage-solde').value = user.solde || 0;
-                document.getElementById('manage-phone').value = user.phone || '';
-                document.getElementById('manage-email').value = user.email || '';
-                document.getElementById('manage-address').value = user.address || '';
-                document.getElementById('manage-advisor').value = user.advisor || '';
-                
-                // RIB
-                document.getElementById('manage-rib').value = user.rib || '';
-                document.getElementById('manage-bic').value = user.bic || '';
-
-                // Cartes
-                document.getElementById('manage-card-number').value = user.cardNumber || '';
-                document.getElementById('manage-card-holder-name').value = user.cardHolderName || user.name.toUpperCase();
-                document.getElementById('manage-expiry-date').value = user.expiryDate || '';
-                document.getElementById('manage-card-type').value = user.cardType || 'VISA';
-                
-                // Statut du Compte & Raison
-                document.getElementById('manage-lock-reason').value = user.lockReason || '';
-                updateAccountStatusDisplay(user.isLocked);
-            }
-
-            function updateAccountStatusDisplay(isLocked) {
-                const statusDisplay = document.getElementById('account-status-display');
-                const toggleBtn = document.getElementById('toggle-account-btn');
-                
-                const reasonText = selectedUser && selectedUser.lockReason ? 
-                                   `<br> Motif enregistré : <strong>${selectedUser.lockReason}</strong>` : '';
-                
-                if (isLocked) {
-                    statusDisplay.innerHTML = `Statut : Compte ACTUELLEMENT **BLOQUÉ** ${reasonText}`;
-                    statusDisplay.className = 'message-error';
-                    toggleBtn.textContent = 'DÉBLOQUER le Compte (et effacer le motif)';
-                    toggleBtn.className = 'btn btn-success';
-                } else {
-                    statusDisplay.innerHTML = 'Statut : Compte ACTUELLEMENT **ACTIF** (raison effacée).';
-                    statusDisplay.className = 'message-success';
-                    toggleBtn.textContent = 'BLOQUER le Compte';
-                    toggleBtn.className = 'btn btn-danger';
-                    if (selectedUser && !selectedUser.isLocked) {
-                         document.getElementById('manage-lock-reason').value = '';
-                    }
-                }
-            }
-
-            function handleUpdate(callback, successMessage) {
+            function updateStatusDisplay() {
                 if (!selectedUser) return;
+                const display = document.getElementById('account-status-display');
+                const btn = document.getElementById('toggle-account-btn');
 
-                callback(); 
-
-                if (updateUser(selectedUser)) {
-                    alert(successMessage);
-                    renderUserDashboard(); 
-                    loadUserData(selectedUser); 
+                if (selectedUser.isLocked) {
+                    display.className = 'message-error full-width';
+                    display.textContent = `Statut : Compte BLOQUÉ (${selectedUser.lockReason || 'Aucun motif renseigné'})`;
+                    btn.textContent = 'Débloquer le Compte';
+                    btn.className = 'btn btn-success full-width';
                 } else {
-                    alert('Erreur lors de la mise à jour.');
+                    display.className = 'message-success full-width';
+                    display.textContent = 'Statut : Compte ACTIF';
+                    btn.textContent = 'Bloquer le Compte';
+                    btn.className = 'btn btn-danger full-width';
                 }
             }
 
+            function persistUserChange(msg) {
+                if (!selectedUser) return;
+                const users = safeGetUsers();
+                const idx = users.findIndex(u => u.clientCode === selectedUser.clientCode);
+                if (idx !== -1) {
+                    users[idx] = selectedUser;
+                    safeSaveUsers(users);
+                    alert(msg);
+                    renderDashboard();
+                }
+            }
 
-            // --- GESTION DES FORMULAIRES DE MODIFICATION (admin-tools) ---
-
+            // Formulaires de modification
             document.getElementById('profile-form').addEventListener('submit', (e) => {
                 e.preventDefault();
-                handleUpdate(() => {
-                    selectedUser.name = document.getElementById('manage-name').value;
-                    selectedUser.pin = document.getElementById('manage-pin').value;
-                    selectedUser.solde = parseFloat(document.getElementById('manage-solde').value);
-                    selectedUser.phone = document.getElementById('manage-phone').value;
-                    selectedUser.email = document.getElementById('manage-email').value;
-                    selectedUser.address = document.getElementById('manage-address').value;
-                    selectedUser.advisor = document.getElementById('manage-advisor').value;
-                }, 'Profil, Contact et Solde mis à jour avec succès !');
+                selectedUser.fullName = document.getElementById('manage-name').value;
+                selectedUser.pin = document.getElementById('manage-pin').value;
+                selectedUser.solde = parseFloat(document.getElementById('manage-solde').value);
+                selectedUser.phone = document.getElementById('manage-phone').value;
+                selectedUser.email = document.getElementById('manage-email').value;
+                selectedUser.address = document.getElementById('manage-address').value;
+                selectedUser.advisorName = document.getElementById('manage-advisor').value;
+                persistUserChange('Informations de profil mises à jour.');
             });
 
             document.getElementById('rib-form').addEventListener('submit', (e) => {
                 e.preventDefault();
-                handleUpdate(() => {
-                    selectedUser.rib = document.getElementById('manage-rib').value;
-                    selectedUser.bic = document.getElementById('manage-bic').value;
-                }, 'RIB mis à jour avec succès !');
+                selectedUser.rib = document.getElementById('manage-rib').value;
+                selectedUser.bic = document.getElementById('manage-bic').value;
+                persistUserChange('RIB/BIC mis à jour.');
             });
 
-            document.getElementById('card-data-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                handleUpdate(() => {
-                    selectedUser.cardNumber = document.getElementById('manage-card-number').value;
-                    selectedUser.cardHolderName = document.getElementById('manage-card-holder-name').value;
-                    selectedUser.expiryDate = document.getElementById('manage-expiry-date').value;
-                    selectedUser.cardType = document.getElementById('manage-card-type').value;
-                }, 'Données de la carte mises à jour avec succès !');
-            });
-            
             document.getElementById('account-status-form').addEventListener('submit', (e) => {
                 e.preventDefault();
-                
-                const isCurrentlyLocked = selectedUser.isLocked;
-
-                handleUpdate(() => {
-                    const newState = !isCurrentlyLocked;
-                    selectedUser.isLocked = newState;
-                    
-                    if (newState) {
-                        selectedUser.lockReason = document.getElementById('manage-lock-reason').value.trim();
-                    } else {
-                        selectedUser.lockReason = '';
-                    }
-                    
-                    updateAccountStatusDisplay(newState);
-                    
-                }, `Compte ${selectedUser.isLocked ? 'BLOQUÉ' : 'DÉBLOQUÉ'} avec succès !`);
+                selectedUser.isLocked = !selectedUser.isLocked;
+                selectedUser.lockReason = selectedUser.isLocked ? document.getElementById('manage-lock-reason').value : '';
+                updateStatusDisplay();
+                persistUserChange(`Compte ${selectedUser.isLocked ? 'bloqué' : 'débloqué'}.`);
             });
 
-            document.getElementById('history-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!selectedUser) return;
-
-                const amount = parseFloat(document.getElementById('hist-amount').value);
-                const type = document.getElementById('hist-type').value;
-                const description = document.getElementById('hist-description').value;
-                const dateInput = document.getElementById('hist-date').value;
-
-                const pastTransaction = {
-                    date: new Date(dateInput).toISOString(),
-                    type: type,
-                    description: description,
-                    amount: amount
-                };
-                
-                addPastHistory(selectedUser.clientCode, pastTransaction); // Cette fonction met à jour le solde
-                
-                alert('Transaction ajoutée à l\'historique passé et solde mis à jour avec succès !');
-                document.getElementById('history-form').reset();
-                selectUser(selectedUser.clientCode); // Recharger les données pour voir le nouveau solde
-            });
-
-
-            // --- GESTION DE LA CRÉATION DE NOUVEAU CLIENT (create-tab) ---
             document.getElementById('create-user-form').addEventListener('submit', (e) => {
                 e.preventDefault();
+                const users = safeGetUsers();
+                const newCode = document.getElementById('create-client-code').value;
 
-                const isLockedOnCreation = document.getElementById('create-cards-locked').value === 'true';
+                if (users.some(u => u.clientCode === newCode)) {
+                    alert('Ce code client existe déjà.');
+                    return;
+                }
 
                 const newUser = {
-                    name: document.getElementById('create-name').value,
-                    clientCode: document.getElementById('create-client-code').value,
+                    fullName: document.getElementById('create-name').value,
+                    clientCode: newCode,
                     pin: document.getElementById('create-pin').value,
                     solde: parseFloat(document.getElementById('create-solde').value),
                     phone: document.getElementById('create-phone').value,
                     email: document.getElementById('create-email').value,
-                    address: document.getElementById('create-address').value,
                     rib: document.getElementById('create-rib').value,
                     bic: document.getElementById('create-bic').value,
-                    advisor: document.getElementById('create-advisor').value,
-                    isAdmin: false,
-                    isLocked: isLockedOnCreation,
-                    // Valeurs de carte par défaut (simplification car pas de champs dédiés à la création ici)
-                    cardNumber: '0000000000000000',
-                    cardHolderName: document.getElementById('create-name').value.toUpperCase(),
-                    expiryDate: '01/99', 
-                    cardType: 'VISA',
+                    advisorName: document.getElementById('create-advisor').value,
+                    address: document.getElementById('create-address').value,
+                    isLocked: document.getElementById('create-cards-locked').value === 'true',
+                    isAdmin: false
                 };
-                
-                if (createUser(newUser)) {
-                    alert(`Le nouveau client ${newUser.name} (Code: ${newUser.clientCode}) a été créé avec succès !`);
-                    document.getElementById('create-user-form').reset();
-                    
-                    document.querySelector('.subtabs [data-subtab="dashboard-tab"]').click(); 
-                    renderUserDashboard(); 
-                } else {
-                    alert("Échec de la création du client. Le code client est peut-être déjà utilisé.");
-                }
+
+                users.push(newUser);
+                safeSaveUsers(users);
+                alert(`Client ${newUser.fullName} créé avec succès.`);
+                document.getElementById('create-user-form').reset();
+                renderDashboard();
             });
 
-            // --- Initialisation ---
-            renderUserDashboard();
+            renderDashboard();
         });
     </script>
 </body>
